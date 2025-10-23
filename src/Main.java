@@ -4,6 +4,9 @@ public class Main {
 
         //user controls - communicating selections
         //interface with each room class
+        //need to parse user inputs
+
+
 
         //each room has unique setup for dialog and options
 
@@ -12,6 +15,7 @@ public class Main {
         //exception handles for following storyline
         //exception handles for user selections
 
+        //the user does not do a "return" or "back" feature
 
 
 
