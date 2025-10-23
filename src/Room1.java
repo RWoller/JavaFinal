@@ -1,5 +1,6 @@
 public class Room1{
 
+    //Dungeon - player wakes up here
     private boolean userSelection = false;
 
     super();
