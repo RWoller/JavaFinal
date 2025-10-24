@@ -6,9 +6,10 @@ public class Room1{
     super();
     //constructor
 
-    public Room1(String userSelection){
-        this.userSelection = true;
-       //do what is needed
+    public Room1(boolean userSelection){
+        setUserSelection(userSelection);
+
+        //do what is needed
 
 
     }
@@ -17,5 +18,17 @@ public class Room1{
 
 
     //close the userSelection and send back for another
-    userSelection(false);
+    setUserSelection(false);
+
+    public getUserSelection(){
+        return  userSelection;
+    }
+
+    public setUserSelection(){
+        this.userSelection = true;
+    }
+
+
+
+
 }

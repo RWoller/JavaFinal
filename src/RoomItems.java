@@ -17,6 +17,7 @@ public class RoomItems{
 
     //method for storing list
     public static String addRoomItems(){
+        itemName.add();
 
     }
 
@@ -35,6 +36,7 @@ public class RoomItems{
 
 
 
+
     }
 
     //method for setting a three item event
@@ -44,15 +46,30 @@ public class RoomItems{
         this.item2 = item2;
         this.item3 = item3;
 
+        //item3 is room1 (dungeon and key)
         if(item1 == null && item2 == null){
             //default this to receiving one value for item3 to create an event
-            this.roomEven = item3;
+            this.roomEvent = item3;
             //key
+            //save key to userControls
+            UserControls userControls = new UserControls();
+
         }
 
-        //save key to userControls
-        UserControls userControls = new UserControls();
-        userControls.add(item3);
+        //item1 is room2 (adventure outside and torch)
+        if(item2 ==null && item3 == null){
+            item1 = "let's light the way and blaze this trail";
+            this.roomEvent = item1;
+        }
+
+        //item2 is the handle to go to the exit
+        if(item1 == null && item3 == null){
+            item2 = "handle with a jangle"
+            this.roomEvent = item2;
+            System.out.println("you didn't do anything wrong, after all, you can leave");
+        }
+
+
 
     }
 

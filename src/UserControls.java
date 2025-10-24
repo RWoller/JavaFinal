@@ -4,6 +4,8 @@ public class UserControls{
 
     //information on item
     private String inspect;
+    //information from inspecting item
+    private String inspection = null;
     //storing the item
     private String take;
     //matching it with room item pair and continuing story
@@ -14,22 +16,49 @@ public class UserControls{
     private ArrayList<String> userItems;
 
     //constructor for checking out an item to keep
-    public UserControls(String inspect, String take, boolean valid) {
+    public UserControls(boolean valid) {
         this.inspect = inspect;
         this.take = take;
+        //default is false - reject item
         this.valid = valid;
 
-        //get information to reveal inspect about the RoomItems (class)
-        RoomItems roomItems = new RoomItems();
-
-
-
         if(valid = true){
-            System.out.println("UserControls - checking item and storing item.");
+
             //adding item to array list
-            userItems.append(take);
+            List<String> userItems = getInspection();
+
+            //exchange "take" for what the user is taking in this round
+            take =
+
+            //add it to the list
+            userItems.add(take);
+
+            //get the approved inspection list
+            System.out.println("UserControls - checking item information and storing item for: " + userItems);
+
+            //
 
         }
+        if(valid = false){
+            System.out.println("UserControls - false checking item information and rejecting item.")
+        }
+        //close this control
+        valid = false;
+    }
+
+    //getting the entire list from here to send to Room1
+    public static List<String> getInspection(){
+        ArrayList<String> userItems = new ArrayList<>();
+        userItems.add("torch");
+        userItems.add("handle");
+        userItems.add("key");
+
+        return userItems;
+    }
+
+    //
+    public static void setInspection(String inspection){
+
     }
 
 
