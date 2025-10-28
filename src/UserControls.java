@@ -1,5 +1,7 @@
 public class UserControls{
 
+    Main main = new Main();
+
     super();
 
     //information on item
@@ -28,7 +30,8 @@ public class UserControls{
             List<String> userItems = getInspection();
 
             //exchange "take" for what the user is taking in this round
-            take =
+            take = main(new EnterDialog());
+
 
             //add it to the list
             userItems.add(take);

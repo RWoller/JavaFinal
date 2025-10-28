@@ -1,28 +1,32 @@
-public class RoomItems{
+public class RoomItems {
 
     super();
     private String roomNoun;
-    private String roomActions;
+    private String roomAction;
     private String roomEvent;
     private ArrayList<String> itemName;
     private String item1, item2, item3;
 
     //for the room
-    public RoomItems(String noun, String actions){
-        //exit - quit early
-        this.roomNoun = noun;
-        //saver search - item to collect in room
-        this.roomActions = actions;
+    public RoomItems(String noun, String actions) {
+       if(action == null){
+           this.roomNoun = noun;
+       }
+       if(noun == null){
+           System.out.println("RoomItems.java = Line 16. The action must belong to a noun!");
+
+       }
     }
 
     //method for storing list
-    public static String addRoomItems(){
-        itemName.add();
+    public static String addRoomItems() {
+        itemName.add(this);
+        return itemName;
 
     }
 
     //method for getting roomItem from list
-    public static String getRoomItemFromList(){
+    public static String getRoomItemFromList() {
         //helps with duplicate code and organizing an index to stay within
         //as validation when using one list
         //3 || null + 1 || null + 1 items from list
@@ -35,51 +39,5 @@ public class RoomItems{
         //as an option to exit or win when done at a specific time in storyline!
 
 
-
-
     }
-
-    //method for setting a three item event
-    public static String setRoomEventFromList(String item1, String item2, String item3){
-        //create an event to use later in story
-        this.item1 = item1;
-        this.item2 = item2;
-        this.item3 = item3;
-
-        //item3 is room1 (dungeon and key)
-        if(item1 == null && item2 == null){
-            //default this to receiving one value for item3 to create an event
-            this.roomEvent = item3;
-            //key
-            //save key to userControls
-            UserControls userControls = new UserControls();
-
-        }
-
-        //item1 is room2 (adventure outside and torch)
-        if(item2 ==null && item3 == null){
-            item1 = "let's light the way and blaze this trail";
-            this.roomEvent = item1;
-        }
-
-        //item2 is the handle to go to the exit
-        if(item1 == null && item3 == null){
-            item2 = "handle with a jangle"
-            this.roomEvent = item2;
-            System.out.println("you didn't do anything wrong, after all, you can leave");
-        }
-
-
-
-    }
-
-    public static String
-    //what I want the room to do for the user
-    //providing its options, the program has to list these options to
-    //interact with to continue
-
-    //
-
-
-
 }
