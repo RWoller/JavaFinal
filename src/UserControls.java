@@ -1,4 +1,4 @@
-public class UserControls{
+public class UserControls implements iRoomModel{
 
     Main main = new Main();
 
@@ -52,16 +52,14 @@ public class UserControls{
     //getting the entire list from here to send to Room1
     public static List<String> getInspection(){
         ArrayList<String> userItems = new ArrayList<>();
-        userItems.add("torch");
-        userItems.add("handle");
-        userItems.add("key");
+        userItems.add();
 
         return userItems;
     }
 
     //
     public static void setInspection(String inspection){
-
+        this.inspection = inspection;
     }
 
 

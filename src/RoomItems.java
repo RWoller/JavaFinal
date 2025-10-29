@@ -1,43 +1,57 @@
-public class RoomItems {
+//Note: Clean the implement and extends to create hierarchy synchrocity
+public class RoomItems implements iRoomModel extends RoomModel{
 
     super();
+    //suggested by group - using for creating a special item for bag
     private String roomNoun;
     private String roomAction;
-    private String roomEvent;
     private ArrayList<String> itemName;
     private String item1, item2, item3;
 
     //for the room
-    public RoomItems(String noun, String actions) {
+    public RoomItems(String noun, String action) {
+        //what is action and where is it coming from?
+
        if(action == null){
            this.roomNoun = noun;
        }
+       //what is noun and what is happening with it?
        if(noun == null){
            System.out.println("RoomItems.java = Line 16. The action must belong to a noun!");
-
+            this.roomAction = action;
        }
+
+       //building requirements for a random special room item from interface
+       if(action!=null && noun!=null){
+
+           itemName.add(getRoomItemFromList());
+       }
+
+
     }
 
     //method for storing list
-    public static String addRoomItems() {
+    public static void addRoomItems() {
         itemName.add(this);
-        return itemName;
 
     }
 
     //method for getting roomItem from list
     public static String getRoomItemFromList() {
-        //helps with duplicate code and organizing an index to stay within
-        //as validation when using one list
-        //3 || null + 1 || null + 1 items from list
-        //maximum combo item (using 3 singular items to build one large item)
-        //example: key, door, keyhole = 1 event
+        itemName = new ArrayList<String>();
+        System.out.println("These are the items in your bag: ");
+        for(item : itemName){
+            System.out.println(item);
+        }
 
-        //example: key = 1 item
-        //example: if key is only picked, save key (this will be a reoccurence)
-        //example: if key and door is only picked, save key, door in list and use
-        //as an option to exit or win when done at a specific time in storyline!
+    }
 
-
+    //I wanted to try a different version of nesting with an interface with enums to override an advanced room item
+    enum AdvancedRoomItem implements iRoomModel{
+        MULTIPLY("multiplies your item amount by 2!");
+        @Override
+        public String dialog1(){
+            return "You get this item x2!"
+        }
     }
 }
