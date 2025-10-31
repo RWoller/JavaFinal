@@ -1,3 +1,6 @@
 Rafael
 // Making a test push
 // I made a push on the project, then reverted from that push.
+
+
+Question 5.) We have not run into any major conflicts at this time.
