@@ -35,27 +35,49 @@ public class Game {
     public void run() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the Adventure!");
+
         while (running) {
-            System.out.println(player.getCurrentRoom().getDescription());
             System.out.print("> ");
             String input = scanner.nextLine();
-            handleCommand(input.trim().toLowerCase());
+            handleInput(input);
         }
         scanner.close();
     }
 
-    private void handleCommand(String input) {
-        if (input.equals("quit")) {
-            running = false;
-            System.out.println("Thanks for playing!");
-            return;
-        } else if (input.startsWith("go ")) {
-            String direction = input.substring(3);
-            player.move(direction);
-        } else if (input.equals("look")) {
-            System.out.println(player.getCurrentRoom().getDescription());
-        } else {
+    // Runs input string through command parser to interpret verb/noun combos and run commands with them
+    private void handleInput(String input) {
+        CommandParser.ParsedCommand cmd = CommandParser.parse(input);
+        CommandType type = cmd.getType();
+
+        if (type == null) {
             System.out.println("I don't understand that command.");
+            return;
+        }
+
+        String noun = cmd.getNoun();
+
+        switch (type) {
+            case GO -> {
+                if (noun == null) {
+                    System.out.println("Go where?");
+                } else {
+                    player.move(noun); // e.g., move("north")
+                }
+            }
+            case TAKE -> {
+                if (noun == null) {
+                    System.out.println("Take what?");
+                } else {
+                    player.takeItem(noun);
+                }
+            }
+            case INVENTORY -> player.showInventory();
+            case LOOK_AROUND -> System.out.println(player.getCurrentRoom().getDescription());
+            case EXIT -> {
+                running = false;
+                System.out.println("Goodbye!");
+            }
+            default -> System.out.println("That command isn't implemented yet.");
         }
     }
 }

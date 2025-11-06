@@ -1,15 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
-    private String name;
+public class Player extends NPC {
     private Room currentRoom;
-    private List<Item> inventory;
 
     public Player(String name, Room startingRoom) {
-        this.name = name;
+        super(name);
         this.currentRoom = startingRoom;
-        this.inventory = new ArrayList<>();
     }
 
     public Room getCurrentRoom() {
@@ -26,13 +23,12 @@ public class Player {
         }
     }
 
-    public void takeItem(String itemName) {
-        Item item = currentRoom.removeItem(itemName);
+    public void takeItem(Item item) {
         if (item != null) {
             inventory.add(item);
-            System.out.println("You picked up the " + itemName + ".");
+            System.out.println("You picked up the " + item.getName() + ".");
         } else {
-            System.out.println("There’s no " + itemName + " here.");
+            System.out.println("There’s no item here.");
         }
     }
 
