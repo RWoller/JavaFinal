@@ -1,0 +1,6 @@
+10-31-2025 15:17:26.769 INFO  [team.exceptionsdemo.LoggingDemo] - Hello World!
+10-31-2025 15:17:26.772 ERROR [team.exceptionsdemo.LoggingDemo] - Error
+java.lang.ArithmeticException: / by zero
+	at team.exceptionsdemo.LoggingDemo.main(LoggingDemo.java:11) ~[JavaFinal/:?]
+10-31-2025 15:17:26.785 WARN  [team.exceptionsdemo.LoggingDemo] - Warning example
+10-31-2025 15:17:26.785 INFO  [team.exceptionsdemo.LoggingDemo] - 0
