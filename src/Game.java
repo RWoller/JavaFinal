@@ -1,5 +1,3 @@
-import org.apache.logging.log4j.core.tools.picocli.CommandLine;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -17,36 +15,27 @@ public class Game {
     private void setupWorld() {
         /// TODO: Change this and use embedded strings
         // Create rooms for our game
-        Room kitchen = new Room("Kitchen", "You see a deep sink and and dusty cupboards. Theres a cookbook that looks well-used");
-        Room whatever1 = new Room("Whatever1,", "Write whatever");
-        Room whatever2 = new Room("Whatever2", "Write whatever");
-        Room whatever3 = new Room("Whatever3", "Maybe this could be the exit?");
+        Room kitchen = new RoomKitchen();
+        Room roomOne = new RoomOne();
+        Room roomTwo = new RoomTwo();
+        Room roomThree = new RoomThree();
 
         // Connect all the rooms
-        kitchen.addExit("east", whatever1);
-        whatever1.addExit("west", kitchen);
+        kitchen.addExit("east", roomOne);
+        roomOne.addExit("west", kitchen);
 
-        whatever1.addExit("south", whatever2);
-        whatever2.addExit("north", whatever1);
+        roomOne.addExit("south", roomTwo);
+        roomTwo.addExit("north", roomOne);
 
-        whatever2.addExit("west", whatever3);
-        whatever3.addExit("east", whatever2); // Player can finish game through this room
-
-        // Add items to kitchen
-        kitchen.addItem(new Item("Cookbook", "Greased up cookbook with a bunch of notes written on it"));
-        kitchen.addItem(new Item("Soap", "Cuts through grease and grime."));
-        kitchen.addItem(new Item("Sink", "Old but still has running water"));
-        kitchen.addItem(new Item("Rag", "Old but still absorbent."));
-
-        // Stubs for adding items is different rooms.
-        whatever1.addItem(new Item("Item1", "Item1"));
-        whatever2.addItem(new Item("Item2", "Item2"));
-        whatever3.addItem(new Item("Item3", "Item3"));
-
+        roomTwo.addExit("west", roomThree);
+        roomThree.addExit("east", roomTwo); // Player can finish game through this room
 
         // Add all rooms to a hashmap
         rooms = new HashMap<>();
         rooms.put("Kitchen", kitchen);
+        rooms.put("RoomOne", roomOne);
+        rooms.put("RoomTwo", roomTwo);
+        rooms.put("RoomThree", roomThree);
 
         // Create new player instance
         /// TODO: Maybe add a way to name the player on game start
@@ -115,7 +104,7 @@ public class Game {
                 if (noun == null) {
                     System.out.println("Examine what?");
                 } else  {
-                    Room room = player.getCurrentRoom(); // ToDo: change to examine room?
+                    examine(noun);
                 }
             }
 
@@ -189,6 +178,57 @@ public class Game {
         }
 
         System.out.println();
+    }
+
+    // use method for player to use their items
+    private void use(String noun) {
+        Room r = player.getCurrentRoom();
+
+        // Use sink to clean the Gunky Key if the player has the rag or soap
+        if (noun.equalsIgnoreCase("sink")) {
+            boolean hasGunkyKey = player.hasItem("Gunky Key");
+            boolean hasSoap = player.hasItem("Soap");
+            boolean hasRag = player.hasItem("Rag");
+
+            if (!hasGunkyKey) {
+                System.out.println("You splash some water around. Nothing important happens.");
+                return;
+            }
+
+            if (hasSoap || hasRag) {
+                if (player.removeItemByName("Gunky Key")) {
+                    player.takeItem(new Item("Clean Key", "A shiny key that should fit the lock."));
+                    System.out.println("You scrub the gunk away. You now have a Clean Key.");
+                } else {
+                    System.out.println("You fumble the key. Try again.");
+                }
+            } else {
+                System.out.println("You rinse the key, but the gunk stays. Maybe use soap or a rag with it.");
+            }
+            return;
+        }
+
+        // Use key on exit door
+        if (noun.equalsIgnoreCase("key") || noun.equalsIgnoreCase("clean key")) {
+            if (!player.hasItem("Clean Key")) {
+                System.out.println("The key is still too dirty, or you don't have the cleaned key.");
+                // To trigger alarm if they try to force it
+                AlarmSystem.getInstance().ActivateAlarm("Someone is messing with the door without the right key.");
+                return;
+            }
+
+            if (!(r instanceof RoomThree)) {
+                System.out.println("There's nothing here that this key fits.");
+                return;
+            }
+
+            System.out.println("You insert the Clean Key into the Heavy Door. It turns with a heavy click.");
+            System.out.println("The door opens. You step outside. You escaped the mansion!");
+            running = false;
+            return;
+        }
+
+        System.out.println("Nothing happens.");
     }
 
 }
