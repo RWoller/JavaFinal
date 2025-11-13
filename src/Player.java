@@ -42,4 +42,25 @@ public class Player extends NPC {
             }
         }
     }
+
+    // To check if player has an item by name
+    public boolean hasItem(String name) {
+        for (Item item : inventory) {
+            if (item.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // To remove item from inventory by name
+    public boolean removeItemByName(String name) {
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.get(i).getName().equalsIgnoreCase(name)) {
+                inventory.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
 }
