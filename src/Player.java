@@ -23,7 +23,7 @@ public class Player extends NPC {
         }
     }
 
-    public void takeItem(Item item) {
+    public void takeItem(RoomObject item) {
         if (item != null) {
             inventory.add(item);
             System.out.println("You picked up the " + item.getName() + ".");
@@ -37,7 +37,7 @@ public class Player extends NPC {
             System.out.println("You have nothing.");
         } else {
             System.out.println("You are carrying:");
-            for (Item item : inventory) {
+            for (RoomObject item : inventory) {
                 System.out.println(" - " + item.getName());
             }
         }

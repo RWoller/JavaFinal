@@ -1,6 +1,7 @@
 import org.apache.logging.log4j.core.tools.picocli.CommandLine;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -10,7 +11,6 @@ public class Game {
     private boolean running = true;
 
     public Game() {
-
         setupWorld();
     }
 
@@ -33,15 +33,15 @@ public class Game {
         whatever3.addExit("east", whatever2); // Player can finish game through this room
 
         // Add items to kitchen
-        kitchen.addItem(new Item("Cookbook", "Greased up cookbook with a bunch of notes written on it"));
-        kitchen.addItem(new Item("Soap", "Cuts through grease and grime."));
-        kitchen.addItem(new Item("Sink", "Old but still has running water"));
-        kitchen.addItem(new Item("Rag", "Old but still absorbent."));
+        kitchen.addItem(new Item("Cookbook", "Greased up cookbook with a bunch of notes written on it", true));
+        kitchen.addItem(new Item("Soap", "Cuts through grease and grime.", true));
+        kitchen.addItem(new Item("Sink", "Old but still has running water", true));
+        kitchen.addItem(new Item("Rag", "Old but still absorbent.", true));
 
         // Stubs for adding items is different rooms.
-        whatever1.addItem(new Item("Item1", "Item1"));
-        whatever2.addItem(new Item("Item2", "Item2"));
-        whatever3.addItem(new Item("Item3", "Item3"));
+        whatever1.addItem(new Item("Item1", "Item1", true));
+        whatever2.addItem(new Item("Item2", "Item2", true));
+        whatever3.addItem(new Item("Item3", "Item3", true));
 
 
         // Add all rooms to a hashmap
@@ -97,7 +97,7 @@ public class Game {
                 } else {
                     // variables to locate and hold item associated with room
                     Room room = player.getCurrentRoom();
-                    Item item =  room.getItem(noun);
+                    RoomObject item =  room.getItem(noun);
 
                     if (item == null) {
                         System.out.println("You don't see that item here.");
@@ -138,12 +138,13 @@ public class Game {
     // Look Method : This method will print a description of rooms and the items contained in it
     private void LookAround(){
         Room r =  player.getCurrentRoom();
+        List<RoomObject> visibleItems = r.getVisibleItems();
         System.out.println(r.getDescription());
 
         // Shows all the items available in the room
-        if (!r.getItems().isEmpty()) {
+        if (!visibleItems.isEmpty()) {
             System.out.println("Items here: ");
-            for (Item item : r.getItems()) {
+            for (RoomObject item : visibleItems) {
                 System.out.println(item.getName());
             }
             System.out.println();
@@ -181,13 +182,12 @@ public class Game {
         }
 
         // Or if it's in your inventory, show that description
-        for (Item it : player.getInventory()) {
+        for (RoomObject it : player.getInventory()) {
             if (it.getName().equalsIgnoreCase(noun)) {
                 System.out.println(it.getDescription());
                 return;
             }
         }
-
         System.out.println();
     }
 

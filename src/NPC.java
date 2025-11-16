@@ -3,7 +3,7 @@ import java.util.List;
 
 public class NPC {
     protected String name;
-    protected List<Item> inventory;
+    protected List<RoomObject> inventory;
     protected int health;
 
     public void takeDamage(int damage) {
@@ -19,7 +19,7 @@ public class NPC {
     }
 
     public String getName() { return name; }
-    public List<Item> getInventory() { return inventory; }
+    public List<RoomObject> getInventory() { return inventory; }
     public int getHealth() { return health; }
 
     public NPC(String name) {
