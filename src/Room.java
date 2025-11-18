@@ -1,11 +1,14 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class Room {
+// ** Abstract **  Base room type. Other rooms extend this.
+public abstract class Room {
     private String name;
     private String description;
     private Map<String, Room> exits = new HashMap<>();
     private List<Item> items = new ArrayList<>();
-    private List<String> npcs = new ArrayList<>();
 
     public Room(String name, String description) {
         this.name = name;
@@ -13,36 +16,29 @@ public class Room {
     }
 
     public String getName() {
-        return name; // ✅ Added to support saving/loading by room name
+        return name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void addExit(String direction, Room destination) {
-        exits.put(direction.toLowerCase(), destination);
+    // Player can use a simple string like "Move north"
+    public void addExit(String direction, Room room) {
+        exits.put(direction.toLowerCase(), room);
     }
 
     public Room getExit(String direction) {
+        if (direction == null) return null;
         return exits.get(direction.toLowerCase());
     }
 
-    public Set<String> getExitNames() {
-        return exits.keySet();
+    public List<String> getExitNames() {
+        return new ArrayList<>(exits.keySet());
     }
 
     public void addItem(Item item) {
         items.add(item);
-    }
-
-    public Item getItem(String itemName) {
-        for (Item item : items) {
-            if (item.getName().equalsIgnoreCase(itemName)) {
-                return item;
-            }
-        }
-        return null;
     }
 
     public void removeItem(Item item) {
@@ -53,15 +49,16 @@ public class Room {
         return items;
     }
 
-    public void addNPC(String npc) {
-        npcs.add(npc.toLowerCase());
+    // Find an item in this room by name
+    public Item getItem(String name) {
+        for (Item item : items) {
+            if (item.getName().equalsIgnoreCase(name)) {
+                return item;
+            }
+        }
+        return null;
     }
 
-    public boolean hasNPC(String name) {
-        return npcs.contains(name.toLowerCase());
-    }
-
-    public List<String> getNPCs() {
-        return npcs;
-    }
+    // ** Base to Polymorphism **  Each room can customize what happens when you enter
+    public abstract void enter(Player player);
 }
