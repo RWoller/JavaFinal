@@ -163,28 +163,21 @@ public class Game {
     // Examine method used for the player to examine objects
     private void examine(String noun) {
         Room r = player.getCurrentRoom();
+        List<RoomObject> visibleItems = r.getVisibleItems();
 
-        // Kitchen - Examine cookbook and add key to inventory
-
-        // Kitchen - Examine sink
-        if (noun.equalsIgnoreCase("sink")) {
-            System.out.println("The old sink still runs. Maybe it could clean something.");
-            return;
-        }
-
-        if (noun.equalsIgnoreCase("soap")) {
-            System.out.println("The soap looks good enough to clean grime and gunk");
-        }
-
-        // Kitchen - Examine rag
-        if (noun.equalsIgnoreCase("rag")) {
-            System.out.println("The rag looks old, but still absorbent.");
+        for (RoomObject item : visibleItems) {
+            if (item.getName().equalsIgnoreCase(noun)) {
+                String description = item.getDescription();
+                System.out.println(description);
+                return;
+            }
         }
 
         // Or if it's in your inventory, show that description
         for (RoomObject it : player.getInventory()) {
             if (it.getName().equalsIgnoreCase(noun)) {
-                System.out.println(it.getDescription());
+                String description = it.getDescription();
+                System.out.println(description);
                 return;
             }
         }
