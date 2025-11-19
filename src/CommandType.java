@@ -1,38 +1,56 @@
-// Enumerated list of some simple commands along with a description
 public enum CommandType {
-    GO(true, "Move in a direction (e.g. 'go north')"),
-    USE(true, "Use an item (e.g. 'use key')"),
-    INVENTORY(false, "Check your inventory"),
-    TAKE(true, "Take an item (e.g. 'take sword')"),
-    TALK(true, "Talk to someone (e.g. 'talk guard')"),
-    EXAMINE(true, "Examine an object (e.g. 'examine statue')"),
-    ATTACK(true, "Attack an enemy (e.g. 'attack goblin')"),
-    LOOK_AROUND(false, "Look around the current room"),
-    EXIT(false, "Quit the game");
+    GO,
+    TAKE,
+    INVENTORY,
+    LOOK_AROUND,
+    EXAMINE,
+    USE,
+    EXIT,
+    HELP;   // added HELP so we can support the help command
 
-    private final boolean requiresNoun;
-    private final String description;
-
-    CommandType(boolean requiresNoun, String description) {
-        this.requiresNoun = requiresNoun;
-        this.description = description;
-    }
-
-    public boolean requiresNoun() {
-        return requiresNoun;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public static CommandType fromString(String input) {
-        String normalized = input.trim().replace(" ", "_").toUpperCase();
-        try {
-            return CommandType.valueOf(normalized);
-        } catch (IllegalArgumentException e) {
+    // Converts the first word of the input into a command type
+    public static CommandType fromString(String verb) {
+        if (verb == null) {
             return null;
+        }
+
+        verb = verb.toLowerCase().trim();
+
+        switch (verb) {
+            case "go":
+            case "move":
+                return GO;
+
+            case "take":
+            case "get":
+            case "grab":
+                return TAKE;
+
+            case "inventory":
+            case "inv":
+            case "i":
+                return INVENTORY;
+
+            // "look" and "look around" are both treated as LOOK_AROUND
+            case "look":
+                return LOOK_AROUND;
+
+            case "examine":
+            case "inspect":
+                return EXAMINE;
+
+            case "use":
+                return USE;
+
+            case "exit":
+            case "quit":
+                return EXIT;
+
+            case "help":
+                return HELP;
+
+            default:
+                return null;
         }
     }
 }
-

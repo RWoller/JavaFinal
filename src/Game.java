@@ -91,8 +91,13 @@ public class Game {
                     if (item == null) {
                         System.out.println("You don't see that item here.");
                     } else {
-                        player.takeItem(item);
-                        room.removeItem(item);
+                        if (item.isCanTake()){
+                            player.takeItem(item);
+                            room.removeItem(item);
+                        } else {
+                            System.out.println("This is not an item that you can take.");
+                        }
+
                     }
                 }
             }
@@ -112,7 +117,7 @@ public class Game {
                 if (noun == null) {
                     System.out.println("Use what?");
                 } else  {
-                    Room room = player.getCurrentRoom(); // ToDo: Create Use method
+                    use(noun); // ToDo: Create Use method
                 }
             }
 
@@ -120,6 +125,20 @@ public class Game {
                 running = false;
                 System.out.println("Goodbye!");
             }
+
+            case HELP -> {
+                // Simple help text for the player
+                System.out.println("Available commands:");
+                System.out.println("- go <direction>   (north, south, east, west)");
+                System.out.println("- take <item>");
+                System.out.println("- inventory");
+                System.out.println("- look or look around");
+                System.out.println("- examine <item>");
+                System.out.println("- use <item>");
+                System.out.println("- help");
+                System.out.println("- exit");
+            }
+
             default -> System.out.println("That command isn't implemented yet.");
         }
     }
@@ -153,6 +172,19 @@ public class Game {
         Room r = player.getCurrentRoom();
 
         // Kitchen - Examine cookbook and add key to inventory
+        if (noun.equalsIgnoreCase("cookbook")) {
+            System.out.println("You open the cookbook and find a sticky, gunk-covered key inside.");
+
+            // Only give the key one time
+            if (!player.hasItem("Gunky Key") && !player.hasItem("Clean Key")) {
+                Item gunkyKey = new Item("Gunky Key", "A metal key caked in gunk. It won't fit into a keyhole yet.", true);
+                player.takeItem(gunkyKey);
+                System.out.println("You take the Gunky Key.");
+            } else {
+                System.out.println("You've already taken the key.");
+            }
+            return;
+        }
 
         // Kitchen - Examine sink
         if (noun.equalsIgnoreCase("sink")) {
@@ -160,13 +192,29 @@ public class Game {
             return;
         }
 
+        // Kitchen - Examine soap
         if (noun.equalsIgnoreCase("soap")) {
-            System.out.println("The soap looks good enough to clean grime and gunk");
+            System.out.println("The soap looks good enough to clean grime and gunk.");
+            return;
         }
 
         // Kitchen - Examine rag
         if (noun.equalsIgnoreCase("rag")) {
             System.out.println("The rag looks old, but still absorbent.");
+            return;
+        }
+
+        // Exit room - Examine heavy door
+        if (noun.equalsIgnoreCase("heavy door")) {
+            System.out.println("The Heavy Door has a narrow keyhole. A properly cleaned key might fit.");
+            return;
+        }
+
+        // If it's in the current room, show that description
+        Item here = r.getItem(noun);
+        if (here != null) {
+            System.out.println(here.getDescription());
+            return;
         }
 
         // Or if it's in your inventory, show that description
@@ -177,8 +225,9 @@ public class Game {
             }
         }
 
-        System.out.println();
+        System.out.println("You don't notice anything special.");
     }
+
 
     // use method for player to use their items
     private void use(String noun) {
@@ -197,8 +246,8 @@ public class Game {
 
             if (hasSoap || hasRag) {
                 if (player.removeItemByName("Gunky Key")) {
-                    player.takeItem(new Item("Clean Key", "A shiny key that should fit the lock."));
                     System.out.println("You scrub the gunk away. You now have a Clean Key.");
+                    player.takeItem(new Item("Clean Key", "A shiny key that should fit the lock.", true));
                 } else {
                     System.out.println("You fumble the key. Try again.");
                 }
@@ -208,8 +257,8 @@ public class Game {
             return;
         }
 
-        // Use key on exit door
-        if (noun.equalsIgnoreCase("key") || noun.equalsIgnoreCase("clean key")) {
+        // Use key or use door
+        if (noun.equalsIgnoreCase("key") || noun.equalsIgnoreCase("clean key") || noun.equalsIgnoreCase("door")) {
             if (!player.hasItem("Clean Key")) {
                 System.out.println("The key is still too dirty, or you don't have the cleaned key.");
                 // To trigger alarm if they try to force it
@@ -225,6 +274,18 @@ public class Game {
             System.out.println("You insert the Clean Key into the Heavy Door. It turns with a heavy click.");
             System.out.println("The door opens. You step outside. You escaped the mansion!");
             running = false;
+            return;
+        }
+
+        if (noun.equalsIgnoreCase("alarm") || noun.equalsIgnoreCase("alarm keypad")) {
+            AlarmSystem status = AlarmSystem.getInstance();
+            if (status.isAlarmActive()) {
+                status.DeactivateAlarm();
+                (System.out).println("Alarm has been deactivated.");
+            } else {
+                status.ActivateAlarm(" you used the keypad");
+                System.out.println("Alarm has been activated.");
+            }
             return;
         }
 

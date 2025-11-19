@@ -13,15 +13,25 @@ public class Player extends NPC {
         return currentRoom;
     }
 
+    // Moves the player in a given direction (north, south, east, west, etc.)
     public void move(String direction) {
+        if (direction == null || direction.isBlank()) {
+            System.out.println("Go where?");
+            return;
+        }
+
+        direction = direction.toLowerCase().trim();
+
         Room nextRoom = currentRoom.getExit(direction);
-        if (nextRoom != null) {
-            currentRoom = nextRoom;
-            System.out.println("You move " + direction + ".");
+        if (nextRoom == null) {
+            System.out.println("You can't go that way.");
         } else {
-            System.out.println("You can’t go that way.");
+            currentRoom = nextRoom;
+            // When entering a new room, call its enter() method so it shows the description
+            currentRoom.enter(this);
         }
     }
+
 
     public void takeItem(Item item) {
         if (item != null) {
