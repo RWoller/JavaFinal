@@ -259,6 +259,14 @@ public class Game {
 
         // Use key or use door
         if (noun.equalsIgnoreCase("key") || noun.equalsIgnoreCase("clean key") || noun.equalsIgnoreCase("door")) {
+
+            // Ensure that the key can only be used in the last room
+            if (!(r instanceof RoomThree)) {
+                System.out.println("There's nothing here that this key fits.");
+                return;
+            }
+
+            // If the player does not have the clean key, the alarm will activate and they will not be able to unlock door
             if (!player.hasItem("Clean Key")) {
                 System.out.println("The key is still too dirty, or you don't have the cleaned key.");
                 // To trigger alarm if they try to force it
@@ -266,11 +274,11 @@ public class Game {
                 return;
             }
 
-            if (!(r instanceof RoomThree)) {
-                System.out.println("There's nothing here that this key fits.");
+            // Ensure that the alarm is deactivated before the door can be opened.
+            if (AlarmSystem.getInstance().isAlarmActive()){
+                System.out.println("You cannot open the door with the alarm on. Deactivate alarm with keypad and try again");
                 return;
             }
-
             System.out.println("You insert the Clean Key into the Heavy Door. It turns with a heavy click.");
             System.out.println("The door opens. You step outside. You escaped the mansion!");
             running = false;
