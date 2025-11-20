@@ -50,8 +50,8 @@ public class Game {
             while (running) {
                 System.out.print("> ");
                 String input = scanner.nextLine();
-
                 CommandParser.ParsedCommand command = CommandParser.parse(input);
+
                 if (command.getType() == null) {
                     System.out.println("Invalid command. Try 'help' for a list of commands.");
                     continue;
@@ -139,6 +139,13 @@ public class Game {
                 System.out.println("- exit");
             }
 
+            case SAVE -> {
+                toSaveData();
+                System.out.println("Saved data!");
+            }
+
+            case LOAD -> {
+            }
             default -> System.out.println("That command isn't implemented yet.");
         }
     }
@@ -300,4 +307,21 @@ public class Game {
         System.out.println("Nothing happens.");
     }
 
+    public SaveData toSaveData() {
+        SaveData sd = new SaveData();
+        sd.playerName = player.getName();
+        sd.health = player.getHealth();
+        sd.level = 1;
+        sd.currentRoom = player.getCurrentRoom().getName();
+        return sd;
+    }
+
+
+    public static Game fromSave(SaveData save) {
+        Game g = new Game();
+        Room startRoom = g.rooms.getOrDefault(save.currentRoom, g.rooms.get("Kitchen"));
+        g.player = new Player(save.playerName, startRoom);
+        g.player.takeDamage(100 - save.health);
+        return g;
+    }
 }

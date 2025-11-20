@@ -6,7 +6,9 @@ public enum CommandType {
     EXAMINE,
     USE,
     EXIT,
-    HELP;   // added HELP so we can support the help command
+    HELP,   // added HELP so we can support the help command
+    SAVE,
+    LOAD;
 
     // Converts the first word of the input into a command type
     public static CommandType fromString(String verb) {
@@ -16,41 +18,19 @@ public enum CommandType {
 
         verb = verb.toLowerCase().trim();
 
-        switch (verb) {
-            case "go":
-            case "move":
-                return GO;
-
-            case "take":
-            case "get":
-            case "grab":
-                return TAKE;
-
-            case "inventory":
-            case "inv":
-            case "i":
-                return INVENTORY;
+        return switch (verb) {
+            case "go", "move" -> GO;
+            case "take", "get", "grab" -> TAKE;
+            case "inventory", "inv", "i" -> INVENTORY;
 
             // "look" and "look around" are both treated as LOOK_AROUND
-            case "look":
-                return LOOK_AROUND;
-
-            case "examine":
-            case "inspect":
-                return EXAMINE;
-
-            case "use":
-                return USE;
-
-            case "exit":
-            case "quit":
-                return EXIT;
-
-            case "help":
-                return HELP;
-
-            default:
-                return null;
-        }
+            case "look" -> LOOK_AROUND;
+            case "examine", "inspect" -> EXAMINE;
+            case "use" -> USE;
+            case "exit", "quit" -> EXIT;
+            case "help" -> HELP;
+            case "save" -> SAVE;
+            default -> null;
+        };
     }
 }
