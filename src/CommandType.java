@@ -1,38 +1,36 @@
-// Enumerated list of some simple commands along with a description
 public enum CommandType {
-    GO(true, "Move in a direction (e.g. 'go north')"),
-    USE(true, "Use an item (e.g. 'use key')"),
-    INVENTORY(false, "Check your inventory"),
-    TAKE(true, "Take an item (e.g. 'take sword')"),
-    TALK(true, "Talk to someone (e.g. 'talk guard')"),
-    EXAMINE(true, "Examine an object (e.g. 'examine statue')"),
-    ATTACK(true, "Attack an enemy (e.g. 'attack goblin')"),
-    LOOK_AROUND(false, "Look around the current room"),
-    EXIT(false, "Quit the game");
+    GO,
+    TAKE,
+    INVENTORY,
+    LOOK_AROUND,
+    EXAMINE,
+    USE,
+    EXIT,
+    HELP,   // added HELP so we can support the help command
+    SAVE,
+    LOAD;
 
-    private final boolean requiresNoun;
-    private final String description;
-
-    CommandType(boolean requiresNoun, String description) {
-        this.requiresNoun = requiresNoun;
-        this.description = description;
-    }
-
-    public boolean requiresNoun() {
-        return requiresNoun;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public static CommandType fromString(String input) {
-        String normalized = input.trim().replace(" ", "_").toUpperCase();
-        try {
-            return CommandType.valueOf(normalized);
-        } catch (IllegalArgumentException e) {
+    // Converts the first word of the input into a command type
+    public static CommandType fromString(String verb) {
+        if (verb == null) {
             return null;
         }
+
+        verb = verb.toLowerCase().trim();
+
+        return switch (verb) {
+            case "go", "move" -> GO;
+            case "take", "get", "grab" -> TAKE;
+            case "inventory", "inv", "i" -> INVENTORY;
+
+            // "look" and "look around" are both treated as LOOK_AROUND
+            case "look" -> LOOK_AROUND;
+            case "examine", "inspect" -> EXAMINE;
+            case "use" -> USE;
+            case "exit", "quit" -> EXIT;
+            case "help" -> HELP;
+            case "save" -> SAVE;
+            default -> null;
+        };
     }
 }
-
