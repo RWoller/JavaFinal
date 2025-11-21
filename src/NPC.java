@@ -35,4 +35,11 @@ public class NPC {
     public void removeItem(Item item) {
         inventory.remove(item);
     }
+
+    public RoomObject getInventoryItem(String itemName) {
+        for (RoomObject item : inventory) {
+            if (item.getName().equals(itemName)) { return item; }
+        }
+        return null;
+    }
 }

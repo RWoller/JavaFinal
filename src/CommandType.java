@@ -8,7 +8,8 @@ public enum CommandType {
     EXAMINE(true, "Examine an object (e.g. 'examine statue')"),
     ATTACK(true, "Attack an enemy (e.g. 'attack goblin')"),
     LOOK_AROUND(false, "Look around the current room"),
-    EXIT(false, "Quit the game");
+    EXIT(false, "Quit the game"),
+    HELP(false, "Help");
 
     private final boolean requiresNoun;
     private final String description;

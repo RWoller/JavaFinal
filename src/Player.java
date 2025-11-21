@@ -42,4 +42,8 @@ public class Player extends NPC {
             }
         }
     }
+    /// TODO: Build this out
+    public void use(RoomObject a, RoomObject b) {
+
+    }
 }

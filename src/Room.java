@@ -11,7 +11,7 @@ public class Room {
     private String description;
     private Map<String, Room> exits = new HashMap<>(); // e.g. "north" -> another Room
     private List<RoomObject> objects = new ArrayList<>();
-    private List<String> npcs = new ArrayList<>();
+    private List<NPC> npcs = new ArrayList<>();
 
     public Room(String name, String description) {
         this.name = name;
@@ -26,8 +26,8 @@ public class Room {
         objects.add(object);
     }
 
-    public void addNPC(String npc) {
-        npcs.add(npc.toLowerCase());
+    public void addNPC(NPC npc) {
+        npcs.add(npc);
     }
 
     public Room getExit(String direction) {
@@ -67,8 +67,17 @@ public class Room {
         return objects;
     }
 
-    public List<String> getNPCs() {
+    public List<NPC> getNPCs() {
         return npcs;
+    }
+
+    public List<String> getAllNounTargets() {
+        List<String> all = new ArrayList<>();
+
+        for (RoomObject object : objects) { all.add(object.getName().toLowerCase()); }
+        for (NPC npc : npcs) { all.add(npc.getName().toLowerCase()); }
+
+        return all;
     }
 
     public class Exit {

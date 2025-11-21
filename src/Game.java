@@ -76,7 +76,9 @@ public class Game {
     // Runs input string through command parser to interpret verb/noun combos and run commands with them
     private void handleInput(CommandParser.ParsedCommand cmd) {
         CommandType type = cmd.getType();
-        String noun = cmd.getNoun();
+        String noun1 = cmd.getNoun1();
+        String noun2 = cmd.getNoun2();
+        Room room = player.getCurrentRoom();
 
         if (type == null) {
             System.out.println("I don't understand that command.");
@@ -85,19 +87,18 @@ public class Game {
 
         switch (type) {
             case GO -> {
-                if (noun == null) {
+                if (noun1 == null) {
                     System.out.println("Go where?");
                 } else {
-                    player.move(noun); // e.g., move("north")
+                    player.move(noun1); // e.g., move("north")
                 }
             }
             case TAKE -> {
-                if (noun == null) {
+                if (noun1 == null) {
                     System.out.println("Take what?");
                 } else {
                     // variables to locate and hold item associated with room
-                    Room room = player.getCurrentRoom();
-                    RoomObject item =  room.getItem(noun);
+                    RoomObject item =  room.getItem(noun1);
 
                     if (item == null) {
                         System.out.println("You don't see that item here.");
@@ -112,18 +113,43 @@ public class Game {
             case LOOK_AROUND -> LookAround();
 
             case EXAMINE -> {
-                if (noun == null) {
+                if (noun1 == null) {
                     System.out.println("Examine what?");
                 } else  {
-                    Room room = player.getCurrentRoom(); // ToDo: change to examine room?
+                    RoomObject item =  room.getItem(noun1);
+
+                    if (item != null) {
+                        System.out.println(item.getDescription());
+                    } else {
+                        System.out.println("You don't see that item here.");
+                    }
                 }
             }
 
             case USE -> {
-                if (noun == null) {
+                if (noun1 == null) {
                     System.out.println("Use what?");
                 } else  {
-                    Room room = player.getCurrentRoom(); // ToDo: Create Use method
+                    if (noun2 == null) {
+                        System.out.println("Use " + noun1 + " on what?");
+                    } else {
+                        // find objects
+                        RoomObject object1 = room.getItem(noun1);
+                        RoomObject object2 = room.getItem(noun2);
+
+                        // inventory fallback when item 1 is in inventory
+                        if (object1 == null) { object1 = player.getInventoryItem(noun1); }
+
+                        if (object1 == null) {
+                            System.out.println("You don't have or see a '" + noun1 + "'.");
+                            return;
+                        }
+
+                        if (object2 == null) {
+                            System.out.println("You don't see a '" + noun2 + "' here.");
+                            return;
+                        }
+                    }
                 }
             }
 
