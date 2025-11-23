@@ -149,6 +149,8 @@ public class Game {
                             System.out.println("You don't see a '" + noun2 + "' here.");
                             return;
                         }
+
+                        player.use(object1, object2);
                     }
                 }
             }
