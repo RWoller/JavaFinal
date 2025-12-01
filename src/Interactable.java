@@ -3,11 +3,12 @@ public interface Interactable {
     void examine();
 
     // Player uses the object
-    void use();
+    default boolean use(){
+        return false;
+    }
 
     // Player attempts to pick it up
-    void take();
-
-    // Player interacts using another object
-    void interact(RoomObject roomObject);
+    default boolean take(){
+        return false;
+    }
 }

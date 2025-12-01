@@ -14,21 +14,30 @@ public class Door extends RoomObject implements Interactable {
     }
 
     @Override
-    public void use() {
+    public boolean use() {
         if (locked) {
             System.out.println("The " + name + " won't budge. Maybe there’s a key?");
         } else {
-            System.out.println("You open the " + name + " and step through.");
+            System.out.println("The door is already open.");
         }
+        return false;
     }
 
     @Override
-    public void take() {
+    public boolean take() {
         System.out.println("Nice try! The " + name + " remains stuck to the wall");
+        return false;
     }
 
-    @Override
-    public void interact(RoomObject roomObject) {
+    public String getKeyId() {
+        return keyId;
+    }
 
+    public void unlock() {
+        locked = false;
+    }
+
+    public void lock() {
+        locked = true;
     }
 }

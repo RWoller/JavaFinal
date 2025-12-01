@@ -18,6 +18,8 @@ public class Player extends NPC {
         if (nextRoom != null) {
             currentRoom = nextRoom;
             System.out.println("You move " + direction + ".");
+            System.out.println("You enter " + currentRoom.getName() + ".");
+            System.out.println(currentRoom.getOnEnter());
         } else {
             System.out.println("You can’t go that way.");
         }

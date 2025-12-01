@@ -17,40 +17,52 @@ public class Game {
     private void setupWorld() {
         /// TODO: Change this and use embedded strings
         // Create rooms for our game
-        Room kitchen = new Room("Kitchen", "You see a deep sink and and dusty cupboards. Theres a cookbook that looks well-used");
-        Room whatever1 = new Room("Whatever1,", "Write whatever");
-        Room whatever2 = new Room("Whatever2", "Write whatever");
-        Room whatever3 = new Room("Whatever3", "Maybe this could be the exit?");
+        Room dungeon = new Room(Strings.get("dungeon_name"), Strings.get("dungeon_desc"), Strings.get("dungeon_onEnter"));
+        Door dungeonDoor = new Door(Strings.get("dungeon_door"),
+                Strings.get("dungeon_door_desc"),
+                "dungeon key", true, true);
+        Key dungeonKey = new Key(Strings.get("dungeon_key"),
+                Strings.get("dungeon_key_desc"),
+                Strings.get("dungeon_key_examine"),
+                null,false, "dungeon key");
+        Shelf dungeonShelf = new Shelf(Strings.get("dungeon_shelf"),
+                Strings.get("dungeon_shelf_desc"),
+                Strings.get("dungeon_shelf_examine"), true);
+        Item dungeonBed = new Item(Strings.get("dungeon_bed"),
+                Strings.get("dungeon bed_desc"),
+                Strings.get("dungeon_bed_examine"),
+                Strings.get("dungeon_bed_use"),
+                true, false);
+        Item dungeonFood = new Item(Strings.get("dungeon_food"),
+                Strings.get("dungeon_food_desc"),
+                Strings.get("dungeon_food_examine"),
+                Strings.get("dungeon_food_use"),
+                true, true);
+        dungeon.addItem(dungeonBed);
+        dungeon.addItem(dungeonFood);
+        dungeon.addItem(dungeonShelf);
+        dungeon.addItem(dungeonDoor);
+        dungeon.addItem(dungeonKey);
+        dungeonShelf.addItem(dungeonFood);
+        dungeonShelf.addItem(dungeonKey);
 
-        // Connect all the rooms
-        kitchen.addExit("east", whatever1);
-        whatever1.addExit("west", kitchen);
+        Room hallway = new Room(Strings.get("hallway_name"),
+                Strings.get("hallway_desc"),
+                Strings.get("hallway_onEnter"));
 
-        whatever1.addExit("south", whatever2);
-        whatever2.addExit("north", whatever1);
+        // Connecting all of the rooms
+        dungeon.addExit("north", dungeonDoor, hallway);
 
-        whatever2.addExit("west", whatever3);
-        whatever3.addExit("east", whatever2); // Player can finish game through this room
-
-        // Add items to kitchen
-        kitchen.addItem(new Item("Cookbook", "Greased up cookbook with a bunch of notes written on it", true));
-        kitchen.addItem(new Item("Soap", "Cuts through grease and grime.", true));
-        kitchen.addItem(new Item("Sink", "Old but still has running water", true));
-        kitchen.addItem(new Item("Rag", "Old but still absorbent.", true));
-
-        // Stubs for adding items is different rooms.
-        whatever1.addItem(new Item("Item1", "Item1", true));
-        whatever2.addItem(new Item("Item2", "Item2", true));
-        whatever3.addItem(new Item("Item3", "Item3", true));
 
 
         // Add all rooms to a hashmap
         rooms = new HashMap<>();
-        rooms.put("Kitchen", kitchen);
+        rooms.put("Dungeon", dungeon);
+        rooms.put("Hallway", hallway);
 
         // Create new player instance
         /// TODO: Maybe add a way to name the player on game start
-        player = new Player("Hero", kitchen);
+        player = new Player("Hero", dungeon);
     }
 
     // Main game loop, prompts for text input
@@ -62,7 +74,9 @@ public class Game {
                 System.out.print("> ");
                 String input = scanner.nextLine();
 
-                CommandParser.ParsedCommand command = CommandParser.parse(input);
+                List<String> targets = player.getCurrentRoom().getAllNounTargets();
+
+                CommandParser.ParsedCommand command = CommandParser.parse(input, targets);
                 if (command.getType() == null) {
                     System.out.println("Invalid command. Try 'help' for a list of commands.");
                     continue;

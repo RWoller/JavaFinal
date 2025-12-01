@@ -9,17 +9,20 @@ import java.util.stream.Collectors;
 public class Room {
     private String name;
     private String description;
-    private Map<String, Room> exits = new HashMap<>(); // e.g. "north" -> another Room
+    private String onEnter;
+    private List<Exit> exits = new ArrayList<>(); // e.g. "north" -> another Room
     private List<RoomObject> objects = new ArrayList<>();
     private List<NPC> npcs = new ArrayList<>();
 
-    public Room(String name, String description) {
+    public Room(String name, String description, String onEnter) {
         this.name = name;
         this.description = description;
+        this.onEnter = onEnter;
     }
 
-    public void addExit(String direction, Room destination) {
-        exits.put(direction.toLowerCase(), destination);
+    public void addExit(String direction, Door door, Room destination) {
+        Exit exit = new Exit(direction, door, destination);
+        exits.add(exit);
     }
 
     public void addItem(RoomObject object) {
@@ -31,7 +34,21 @@ public class Room {
     }
 
     public Room getExit(String direction) {
-        return exits.get(direction.toLowerCase());
+        for (Exit exit : exits) {
+            if (exit.getDirection().equals(direction)) {
+                return exit.leadsTo;
+            }
+        }
+        return null;
+    }
+
+    public String getExitDirection(Door door) {
+        for (Exit exit : exits) {
+            if (exit.getDoor() == door) {
+                return exit.getDirection();
+            }
+        }
+        return null;
     }
 
     public RoomObject getItem(String itemName) {
@@ -55,12 +72,21 @@ public class Room {
         objects.remove(object);
     }
 
+
+    public String getName() {
+        return name;
+    }
+
     public String getDescription() {
         return description;
     }
 
+    public String getOnEnter() {
+        return onEnter;
+    }
+
     public Set<String> getExitNames() {
-        return exits.keySet();
+        return exits.stream().map(Exit::getDirection).collect(Collectors.toSet());
     }
 
     public List<RoomObject> getObjects() {
@@ -70,6 +96,7 @@ public class Room {
     public List<NPC> getNPCs() {
         return npcs;
     }
+
 
     public List<String> getAllNounTargets() {
         List<String> all = new ArrayList<>();

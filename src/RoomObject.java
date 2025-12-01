@@ -3,6 +3,7 @@ public abstract class RoomObject {
     protected String name;
     protected String description;
     protected boolean visible;
+    protected boolean takable;
 
     public RoomObject(String name, String description, boolean visible) {
         this.name = name;
@@ -20,5 +21,10 @@ public abstract class RoomObject {
     }
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public boolean useOn(RoomObject target, Player player, Room room) {
+        System.out.println("Nothing happens...");
+        return false;
     }
 }
