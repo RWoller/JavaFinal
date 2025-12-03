@@ -1,23 +1,23 @@
-public class Item {
+public class Item extends RoomObject implements Comparable<Item> {
 
-    // **Immutable** Once these are set with constructor, they don't change
-    private final String name;
-    private final String description;
-    private final boolean canTake;
+    private boolean canTake;
 
-    public Item(String name, String description, boolean canTake) {
-        this.name = name;
-        this.description = description;
-        this.canTake = canTake;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
+    public Item(String name, String description, boolean visible) {
+        super(name, description, visible);
+        this.canTake = visible;
     }
 
     public boolean isCanTake() { return canTake; }
+
+    // Required method from Comparable class
+    @Override
+    public int compareTo(Item o) {
+        return this.name.compareTo(o.name);
+    }
+
+    // ** Override of .toString() **
+    @Override
+    public String toString() {
+        return this.name + ": " + this.description;
+    }
 }

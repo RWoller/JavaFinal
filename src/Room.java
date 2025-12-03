@@ -8,7 +8,7 @@ public abstract class Room {
     private String name;
     private String description;
     private Map<String, Room> exits = new HashMap<>();
-    private List<Item> items = new ArrayList<>();
+    private List<RoomObject> items = new ArrayList<>();
 
     public Room(String name, String description) {
         this.name = name;
@@ -37,27 +37,28 @@ public abstract class Room {
         return new ArrayList<>(exits.keySet());
     }
 
-    public void addItem(Item item) {
-        items.add(item);
+    public void addItem(RoomObject object) {
+        items.add(object);
     }
 
     public void removeItem(Item item) {
         items.remove(item);
     }
 
-    public List<Item> getItems() {
+    public List<RoomObject> getItems() {
         return items;
     }
 
     // Find an item in this room by name
-    public Item getItem(String name) {
-        for (Item item : items) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return item;
+    public RoomObject getItem(String name) {
+        for (RoomObject obj : items) {
+            if (obj.getName().equalsIgnoreCase(name)) {
+                return obj;
             }
         }
         return null;
     }
+
 
     // ** Base to Polymorphism **  Each room can customize what happens when you enter
     public abstract void enter(Player player);

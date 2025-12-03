@@ -42,25 +42,21 @@ public class Player extends NPC {
         }
     }
 
+    // ** Lambda Expression ** to show inventory
     public void showInventory() {
         if (inventory.isEmpty()) {
             System.out.println("You have nothing.");
         } else {
             System.out.println("You are carrying:");
-            for (Item item : inventory) {
-                System.out.println(" - " + item.getName());
-            }
+            inventory.forEach(item -> System.out.println(" - " + item.getName()));
         }
     }
 
     // To check if player has an item by name
+    // Use of ** Lambda Expression **
     public boolean hasItem(String name) {
-        for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return true;
-            }
-        }
-        return false;
+        return inventory.stream()
+                .anyMatch(item -> item.getName().equalsIgnoreCase(name));
     }
 
     // To remove item from inventory by name

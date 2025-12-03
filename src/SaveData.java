@@ -4,4 +4,6 @@ public class SaveData {
     public int health;
     public int level;
     public String currentRoom; // store room name instead of description
+
+    public String savedAt; // ** Date Time Usage **
 }

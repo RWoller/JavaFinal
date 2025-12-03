@@ -6,10 +6,30 @@ public class Game {
     private Player player;
     private Map<String, Room> rooms;
     private boolean running = true;
+    private DatabaseManager dbManager;
+    private Scanner scanner;
 
-    public Game() {
 
+    public Game(Player player, DatabaseManager dbManager, Scanner scanner) {
+        this.player = player;
+        this.dbManager = dbManager;
+        this.scanner = scanner;
         setupWorld();
+    }
+
+    // *** Overloaded Constructor ***
+    public Game(DatabaseManager dbManager,  Scanner scanner) {
+        this.dbManager = dbManager;
+        this.scanner = scanner;
+        setupWorld();
+    }
+
+    // Getter method requred by Main to save name of player. This just creates an instance of the game
+    public Room getRoom(String roomName) {
+        if (rooms == null) {
+            setupWorld();
+        }
+        return rooms.get(roomName);
     }
 
     private void setupWorld() {
@@ -46,19 +66,31 @@ public class Game {
     public void run() {
         System.out.println("You open your eyes in a strange mansion. . . Type 'help' for a list of commands.");
 
-        try(Scanner scanner = new Scanner(System.in)) {
             while (running) {
                 System.out.print("> ");
                 String input = scanner.nextLine();
-                CommandParser.ParsedCommand command = CommandParser.parse(input);
+                CommandParser.ParsedCommand command;
 
-                if (command.getType() == null) {
-                    System.out.println("Invalid command. Try 'help' for a list of commands.");
-                    continue;
+                // Use try-catch-block for parser and use *** Custom Exception ***
+                try {
+                    command = CommandParser.parse(input);
+                    handleInput(command);
+                } catch (CommandException e) {
+                    // Customer error message
+                    System.out.println("Error: " + e.getMessage());
+                    System.out.println("Try 'help' for a list of commands.");
+
+                    // Log the error
+                    ErrorLogger.logError("Player entered an invalid command. " + e.getMessage());
+
+                    // Catch all other errors
+                } catch (Exception e){
+                    System.out.println("A system error occurred: " + e.getMessage());
+
+                    // Then log it
+                    ErrorLogger.logError("System error: " + e.getMessage());
                 }
-                handleInput(command);
             }
-        }
         System.out.println("Thanks for playing!");
     }
 
@@ -86,18 +118,18 @@ public class Game {
                 } else {
                     // variables to locate and hold item associated with room
                     Room room = player.getCurrentRoom();
-                    Item item =  room.getItem(noun);
+                    RoomObject obj =  room.getItem(noun);
 
-                    if (item == null) {
-                        System.out.println("You don't see that item here.");
-                    } else {
+                    // Check if it's an item AND if it can be picked up
+                    if (obj instanceof Item item) {
                         if (item.isCanTake()){
                             player.takeItem(item);
                             room.removeItem(item);
                         } else {
                             System.out.println("This is not an item that you can take.");
                         }
-
+                    } else {
+                        System.out.println("You don't see that item here.");
                     }
                 }
             }
@@ -158,7 +190,7 @@ public class Game {
         // Shows all the items available in the room
         if (!r.getItems().isEmpty()) {
             System.out.println("Items here: ");
-            for (Item item : r.getItems()) {
+            for (RoomObject item : r.getItems()) {
                 System.out.println(item.getName());
             }
             System.out.println();
@@ -180,15 +212,10 @@ public class Game {
 
         // Kitchen - Examine cookbook and add key to inventory
         if (noun.equalsIgnoreCase("cookbook")) {
-            System.out.println("You open the cookbook and find a sticky, gunk-covered key inside.");
-
-            // Only give the key one time
             if (!player.hasItem("Gunky Key") && !player.hasItem("Clean Key")) {
                 Item gunkyKey = new Item("Gunky Key", "A metal key caked in gunk. It won't fit into a keyhole yet.", true);
                 player.takeItem(gunkyKey);
                 System.out.println("You take the Gunky Key.");
-            } else {
-                System.out.println("You've already taken the key.");
             }
             return;
         }
@@ -218,9 +245,9 @@ public class Game {
         }
 
         // If it's in the current room, show that description
-        Item here = r.getItem(noun);
-        if (here != null) {
-            System.out.println(here.getDescription());
+        RoomObject roomObj = r.getItem(noun);
+        if (roomObj != null) {
+            System.out.println(roomObj.getDescription());
             return;
         }
 
@@ -288,6 +315,10 @@ public class Game {
             }
             System.out.println("You insert the Clean Key into the Heavy Door. It turns with a heavy click.");
             System.out.println("The door opens. You step outside. You escaped the mansion!");
+
+            // Record the escape upon winning the game
+            dbManager.recordEscape(player.getName());
+
             running = false;
             return;
         }
@@ -317,11 +348,16 @@ public class Game {
     }
 
 
-    public static Game fromSave(SaveData save) {
-        Game g = new Game();
-        Room startRoom = g.rooms.getOrDefault(save.currentRoom, g.rooms.get("Kitchen"));
+    public static Game fromSave(SaveData save, DatabaseManager dbManager, Scanner scanner) {
+        // Use the new overloaded constructor to initialize the environment
+        Game g = new Game(dbManager, scanner);
+
+        // Get the correct starting room for the loaded game
+        Room startRoom = g.getRoom(save.currentRoom);
+
+        // Restore player state
         g.player = new Player(save.playerName, startRoom);
-        g.player.takeDamage(100 - save.health);
+
         return g;
     }
 }
