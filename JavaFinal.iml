@@ -9,7 +9,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$USER_HOME$/Library/CloudStorage/OneDrive-NortheastWisconsinTechnicalCollege(2)/Java2/Week 2/apache-log4j-2.17.2-bin/log4j-api-2.17.2.jar!/" />
@@ -58,9 +58,18 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="log4j-api-2.17.2" level="project" />
-    <orderEntry type="library" name="log4j-api-2.17.2-javadoc" level="project" />
-    <orderEntry type="library" name="log4j-core-2.17.2" level="project" />
-    <orderEntry type="library" name="log4j-core-2.17.2-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="log4j-api-2.17.2" level="project" />
+    <orderEntry type="library" exported="" name="log4j-api-2.17.2-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="log4j-core-2.17.2" level="project" />
+    <orderEntry type="library" exported="" name="log4j-core-2.17.2-javadoc" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Downloads/sqlite-jdbc-3.51.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
