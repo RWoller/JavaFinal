@@ -73,6 +73,7 @@ public class Game {
             while (running) {
                 System.out.print("> ");
                 String input = scanner.nextLine();
+                CommandParser.ParsedCommand command = CommandParser.parse(input);
 
                 List<String> targets = player.getCurrentRoom().getAllNounTargets();
 
