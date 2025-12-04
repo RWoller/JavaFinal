@@ -15,25 +15,19 @@ public class Player extends NPC {
 
     // Moves the player in a given direction (north, south, east, west, etc.)
     public void move(String direction) {
-        if (direction == null || direction.isBlank()) {
-            System.out.println("Go where?");
-            return;
-        }
-
         direction = direction.toLowerCase().trim();
-
         Room nextRoom = currentRoom.getExit(direction);
-        if (nextRoom == null) {
-            System.out.println("You can't go that way.");
-        } else {
+        if (nextRoom != null) {
             currentRoom = nextRoom;
-            // When entering a new room, call its enter() method so it shows the description
-            currentRoom.enter(this);
+            System.out.println("You move " + direction + ".");
+            System.out.println("You enter " + currentRoom.getName() + ".");
+            System.out.println(currentRoom.getOnEnter());
+        } else {
+            System.out.println("You can’t go that way.");
         }
     }
 
-
-    public void takeItem(Item item) {
+    public void takeItem(RoomObject item) {
         if (item != null) {
             inventory.add(item);
             System.out.println("You picked up the " + item.getName() + ".");
@@ -47,7 +41,7 @@ public class Player extends NPC {
             System.out.println("You have nothing.");
         } else {
             System.out.println("You are carrying:");
-            for (Item item : inventory) {
+            for (RoomObject item : inventory) {
                 System.out.println(" - " + item.getName());
             }
         }
