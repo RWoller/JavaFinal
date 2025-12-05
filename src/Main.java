@@ -20,7 +20,7 @@ public class Main {
 
                     // Create the world to get the starting room "Kitchen
 
-                    // The simplest way to get the starting room without exposing world data:
+                    // The simplest way to get the starting room:
                     // Create a temporary, minimal Game instance just to get the starting room.
                     Game tempGame = new Game(null, dbManager, scanner);
                     Room startingRoom = tempGame.getRoom("Kitchen");

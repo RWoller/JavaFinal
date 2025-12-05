@@ -6,8 +6,8 @@ public class Game {
     private Player player;
     private Map<String, Room> rooms;
     private boolean running = true;
-    private DatabaseManager dbManager;
-    private Scanner scanner;
+    private final DatabaseManager dbManager;
+    private final Scanner scanner;
 
 
     public Game(Player player, DatabaseManager dbManager, Scanner scanner) {

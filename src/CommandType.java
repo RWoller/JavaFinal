@@ -21,7 +21,7 @@ public enum CommandType {
         return switch (verb) {
             case "go", "move" -> GO;
             case "take", "get", "grab" -> TAKE;
-            case "inventory", "inv", "i" -> INVENTORY;
+            case "inventory", "i" -> INVENTORY;
 
             // "look" and "look around" are both treated as LOOK_AROUND
             case "look" -> LOOK_AROUND;
