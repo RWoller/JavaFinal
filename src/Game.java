@@ -210,15 +210,39 @@ public class Game {
     private void examine(String noun) {
         Room r = player.getCurrentRoom();
 
-        // Kitchen - Examine cookbook and add key to inventory
-        if (noun.equalsIgnoreCase("cookbook")) {
-            if (!player.hasItem("Gunky Key") && !player.hasItem("Clean Key")) {
-                Item gunkyKey = new Item("Gunky Key", "A metal key caked in gunk. It won't fit into a keyhole yet.", true);
-                player.takeItem(gunkyKey);
-                System.out.println("You take the Gunky Key.");
+        // If the target is a Container, reveal its contents
+        RoomObject obj = r.getItem(noun);
+        if (obj instanceof Container<?> container) {
+
+            // Show the container description
+            System.out.println(obj.getDescription());
+
+            // Reveal what’s inside the container
+            Object content = container.getContents();
+
+            if (content instanceof Item itemInside) {
+                System.out.println("You open the " + obj.getName() + " and find a " + itemInside.getName() + ".");
+
+                // Mark it visible so the player can see/take it
+                itemInside.setVisible(true);
+
+                // Add to player inventory automatically, OR require "take" — your choice
+                player.takeItem(itemInside);
+
+                return;
             }
-            return;
         }
+
+
+        // Kitchen - Examine cookbook and add key to inventory
+        //if (noun.equalsIgnoreCase("cookbook")) {
+        //    if (!player.hasItem("Gunky Key") && !player.hasItem("Clean Key")) {
+        //        Item gunkyKey = new Item("Gunky Key", "A metal key caked in gunk. It won't fit into a keyhole yet.", true);
+        //        player.takeItem(gunkyKey);
+        //        System.out.println("You take the Gunky Key.");
+        //    }
+        //    return;
+        //}
 
         // Kitchen - Examine sink
         if (noun.equalsIgnoreCase("sink")) {
@@ -337,6 +361,12 @@ public class Game {
 
         System.out.println("Nothing happens.");
     }
+
+    // Getter so Main can access the Player object
+    public Player getPlayer() {
+        return player;
+    }
+
 
     public SaveData toSaveData() {
         SaveData sd = new SaveData();

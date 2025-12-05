@@ -45,6 +45,7 @@ public class Savepoint {
                     case "health" -> sd.health = parseIntSafe(value, 100);
                     case "level" -> sd.level = parseIntSafe(value, 1);
                     case "currentRoom" -> sd.currentRoom = value;
+                    case "savedAt" -> sd.savedAt = value;
                 }
             }
         } catch (IOException e) {
@@ -63,4 +64,14 @@ public class Savepoint {
             return fallback;
         }
     }
+
+    // Delete the save file if it exists
+    public static boolean deleteSave() {
+        File f = new File(SAVE_FILE);
+        if (!f.exists()) {
+            return false;
+        }
+        return f.delete();
+    }
+
 }

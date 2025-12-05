@@ -15,7 +15,7 @@ public class Item extends RoomObject implements Comparable<Item> {
         return this.name.compareTo(o.name);
     }
 
-    // ** Override of .toString() **
+    // Override
     @Override
     public String toString() {
         return this.name + ": " + this.description;

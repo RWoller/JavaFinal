@@ -9,6 +9,12 @@ public class Player extends NPC {
         this.currentRoom = startingRoom;
     }
 
+    // Allow Main to change the player name after creation
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
     public Room getCurrentRoom() {
         return currentRoom;
     }
