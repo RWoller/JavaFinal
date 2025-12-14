@@ -1,10 +1,8 @@
 import java.util.ResourceBundle;
 
+/**
+ * Simple string resource wrapper. You can expand to use a strings.properties file later.
+ */
 public class Strings {
-    private static final ResourceBundle bundle = ResourceBundle.getBundle("strings");
-
-    public static String get(String key, Object... args) {
-        String template = bundle.getString(key);
-        return String.format(template, args);
-    }
+    public static final String WELCOME = "Welcome to Fractured Memo! (type 'help' during play)";
 }

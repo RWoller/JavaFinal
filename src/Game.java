@@ -1,327 +1,316 @@
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
+/**
+ * Core game loop and state manager.
+ * Uses GameDatabase for saves and logs.
+ */
 public class Game {
     private Player player;
-    private Map<String, Room> rooms;
+    private final Map<String, Room> rooms = new HashMap<>();
+    private Room currentRoom;
     private boolean running = true;
+    private final Scanner scanner = new Scanner(System.in);
 
     public Game() {
-
+        GameDatabase.init(); // ensure DB and tables exist
         setupWorld();
+        // default start in kitchen
+        player = new Player("Hero", rooms.get("RoomKitchen"));
+        currentRoom = player.getCurrentRoom();
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public Room getRoom(String name) {
+        return rooms.get(name);
+    }
+
+    public void setCurrentRoom(Room room) {
+        this.currentRoom = room;
+    }
+
+
+    public Game(SaveData data) {
+        GameDatabase.init();
+        setupWorld();
+        Room start = rooms.getOrDefault(data.currentRoom, rooms.get("RoomKitchen"));
+        player = new Player(data.playerName, start);
+        currentRoom = player.getCurrentRoom();
+        if (data.inventory != null && !data.inventory.isBlank()) {
+            for (String name : data.inventory.split(",")) {
+                player.takeItem(new Item(name.trim(), "Restored item"));
+            }
+        }
     }
 
     private void setupWorld() {
-        /// TODO: Change this and use embedded strings
-        // Create rooms for our game
-        Room kitchen = new RoomKitchen();
-        Room roomOne = new RoomOne();
-        Room roomTwo = new RoomTwo();
-        Room roomThree = new RoomThree();
+        RoomKitchen kitchen = new RoomKitchen();
+        RoomLivingQuarters roomLivingQuarters = new RoomLivingQuarters();
+        RoomGreenhouse roomGreenhouse = new RoomGreenhouse();
+        RoomRoyalChamber roomRoyalChamber = new RoomRoyalChamber();
 
-        // Connect all the rooms
-        kitchen.addExit("east", roomOne);
-        roomOne.addExit("west", kitchen);
+        // connect rooms (consistent keys used in GameDatabase saves)
+        kitchen.addExit("east", roomLivingQuarters);
+        roomLivingQuarters.addExit("west", kitchen);
+        roomLivingQuarters.addExit("south", roomGreenhouse);
+        roomGreenhouse.addExit("north", roomLivingQuarters);
+        roomGreenhouse.addExit("west", roomRoyalChamber);
+        roomRoyalChamber.addExit("east", roomGreenhouse);
 
-        roomOne.addExit("south", roomTwo);
-        roomTwo.addExit("north", roomOne);
+        rooms.put("RoomKitchen", kitchen);
+        rooms.put("RoomOne", roomLivingQuarters);
+        rooms.put("RoomTwo", roomGreenhouse);
+        rooms.put("RoomThree", roomRoyalChamber);
 
-        roomTwo.addExit("west", roomThree);
-        roomThree.addExit("east", roomTwo); // Player can finish game through this room
-
-        // Add all rooms to a hashmap
-        rooms = new HashMap<>();
-        rooms.put("Kitchen", kitchen);
-        rooms.put("RoomOne", roomOne);
-        rooms.put("RoomTwo", roomTwo);
-        rooms.put("RoomThree", roomThree);
-
-        // Create new player instance
-        /// TODO: Maybe add a way to name the player on game start
-        player = new Player("Hero", kitchen);
+        // place sample items (kept in constructors for rooms)
     }
 
-    // Main game loop, prompts for text input
     public void run() {
-        System.out.println("You open your eyes in a strange mansion. . . Type 'help' for a list of commands.");
+        System.out.println("You open your eyes in a strange mansion... Type 'help' for a list of commands.");
+        if (currentRoom != null) currentRoom.enter(player);
 
-        try(Scanner scanner = new Scanner(System.in)) {
-            while (running) {
-                System.out.print("> ");
-                String input = scanner.nextLine();
-                CommandParser.ParsedCommand command = CommandParser.parse(input);
-
-                if (command.getType() == null) {
-                    System.out.println("Invalid command. Try 'help' for a list of commands.");
-                    continue;
-                }
-                handleInput(command);
+        while (running) {
+            System.out.print("> ");
+            String input;
+            try {
+                input = scanner.nextLine();
+            } catch (NoSuchElementException | IllegalStateException e) {
+                // input closed — exit gracefully
+                running = false;
+                break;
             }
+
+            CommandParser.ParsedCommand command = CommandParser.parse(input);
+            if (command.getType() == CommandType.UNKNOWN) {
+                System.out.println("I don't understand that. Type 'help' for commands.");
+                continue;
+            }
+
+            handleInput(command);
         }
+
         System.out.println("Thanks for playing!");
     }
 
-    // Runs input string through command parser to interpret verb/noun combos and run commands with them
     private void handleInput(CommandParser.ParsedCommand cmd) {
         CommandType type = cmd.getType();
         String noun = cmd.getNoun();
 
-        if (type == null) {
-            System.out.println("I don't understand that command.");
-            return;
-        }
-
         switch (type) {
             case GO -> {
                 if (noun == null) {
-                    System.out.println("Go where?");
+                    System.out.println("Go where? (type a direction from the exits list or an exit name)");
                 } else {
-                    player.move(noun); // e.g., move("north")
+                    Room next = currentRoom.getExit(noun);
+                    if (next == null) {
+                        System.out.println("You can't go that way.");
+                    } else {
+                        player.moveTo(next);
+                        currentRoom = player.getCurrentRoom();
+                        currentRoom.enter(player);
+                        GameDatabase.log(player.getName(), "Moved to " + currentRoom.getName());
+                    }
                 }
             }
             case TAKE -> {
                 if (noun == null) {
                     System.out.println("Take what?");
+                    return;
+                }
+                Item item = currentRoom.getItem(noun);
+                if (item == null) {
+                    System.out.println("You don't see that item here.");
                 } else {
-                    // variables to locate and hold item associated with room
-                    Room room = player.getCurrentRoom();
-                    Item item =  room.getItem(noun);
-
-                    if (item == null) {
-                        System.out.println("You don't see that item here.");
-                    } else {
-                        if (item.isCanTake()){
-                            player.takeItem(item);
-                            room.removeItem(item);
-                        } else {
-                            System.out.println("This is not an item that you can take.");
-                        }
-
-                    }
+                    player.takeItem(item);
+                    currentRoom.removeItem(item);
+                    System.out.println("You take the " + item.getName() + ".");
+                    GameDatabase.log(player.getName(), "Took " + item.getName());
                 }
             }
-            case INVENTORY -> player.showInventory();
-
-            case LOOK_AROUND -> LookAround();
-
+            case INVENTORY -> {
+                player.showInventory();
+                GameDatabase.log(player.getName(), "Checked inventory");
+            }
+            case LOOK -> {
+                lookAround();
+                GameDatabase.log(player.getName(), "Looked around");
+            }
             case EXAMINE -> {
                 if (noun == null) {
                     System.out.println("Examine what?");
-                } else  {
-                    examine(noun);
+                    return;
+                }
+                examine(noun);
+                GameDatabase.log(player.getName(), "Examined " + noun);
+            }
+            case TALK -> {
+                if (noun == null) {
+                    System.out.println("Talk to whom?");
+                    return;
+                }
+                NPC npc = currentRoom.getNpcByName(noun);
+                if (npc == null) {
+                    System.out.println("There's no one by that name here.");
+                } else {
+                    System.out.println(npc.getName() + " says: \"" + npc.speak() + "\"");
+                    GameDatabase.log(player.getName(), "Talked with " + npc.getName());
                 }
             }
-
             case USE -> {
                 if (noun == null) {
                     System.out.println("Use what?");
-                } else  {
-                    use(noun); // ToDo: Create Use method
+                    return;
+                }
+                useItem(noun);
+            }
+            case SAVE -> {
+                GameDatabase.saveGame(player);
+                System.out.println("Game saved for player '" + player.getName() + "'.");
+            }
+            case LOAD -> {
+                SaveData sd = GameDatabase.loadGame(player.getName());
+                if (sd == null) {
+                    System.out.println("No saved game found for player '" + player.getName() + "'.");
+                } else {
+                    // reconstruct player & room
+                    Room start = rooms.getOrDefault(sd.currentRoom, rooms.get("RoomKitchen"));
+                    player = new Player(sd.playerName, start);
+                    currentRoom = player.getCurrentRoom();
+                    if (sd.inventory != null && !sd.inventory.isBlank()) {
+                        for (String it : sd.inventory.split(",")) player.takeItem(new Item(it.trim(), "Restored item"));
+                    }
+                    System.out.println("Game loaded.");
+                    currentRoom.enter(player);
                 }
             }
-
+            case HELP -> {
+                showHelp();
+            }
             case EXIT -> {
                 running = false;
-                System.out.println("Goodbye!");
+                System.out.println("Exiting game...");
+                GameDatabase.log(player.getName(), "Exited game");
             }
-
-            case HELP -> {
-                // Simple help text for the player
-                System.out.println("Available commands:");
-                System.out.println("- go <direction>   (north, south, east, west)");
-                System.out.println("- take <item>");
-                System.out.println("- inventory");
-                System.out.println("- look or look around");
-                System.out.println("- examine <item>");
-                System.out.println("- use <item>");
-                System.out.println("- help");
-                System.out.println("- exit");
-            }
-
-            case SAVE -> {
-                toSaveData();
-                System.out.println("Saved data!");
-            }
-
-            case LOAD -> {
-            }
-            default -> System.out.println("That command isn't implemented yet.");
+            default -> System.out.println("Unknown command.");
         }
     }
 
-    // Look Method : This method will print a description of rooms and the items contained in it
-    private void LookAround(){
-        Room r =  player.getCurrentRoom();
-        System.out.println(r.getDescription());
+    private void lookAround() {
+        System.out.println(currentRoom.getDescription());
 
-        // Shows all the items available in the room
-        if (!r.getItems().isEmpty()) {
-            System.out.println("Items here: ");
-            for (Item item : r.getItems()) {
-                System.out.println(item.getName());
+        if (!currentRoom.getItems().isEmpty()) {
+            System.out.println("Items here:");
+            for (Item item : currentRoom.getItems()) {
+                System.out.println(" - " + item.getName());
             }
-            System.out.println();
+        } else {
+            System.out.println("No items visible here.");
         }
 
-        // Shows all the exits in the room
-        if (!r.getExitNames().isEmpty()) {
-            System.out.println("Exits here: ");
-            for (String name : r.getExitNames()) {
-                System.out.println(name);
-            }
-            System.out.println();
+        List<String> exits = currentRoom.getExitNames();
+        if (!exits.isEmpty()) {
+            System.out.println("Exits here:");
+            for (String ex : exits) System.out.println(" - " + ex);
+        } else {
+            System.out.println("No exits visible.");
         }
     }
 
-    // Examine method used for the player to examine objects
     private void examine(String noun) {
-        Room r = player.getCurrentRoom();
-
-        // Kitchen - Examine cookbook and add key to inventory
-        if (noun.equalsIgnoreCase("cookbook")) {
-            System.out.println("You open the cookbook and find a sticky, gunk-covered key inside.");
-
-            // Only give the key one time
-            if (!player.hasItem("Gunky Key") && !player.hasItem("Clean Key")) {
-                Item gunkyKey = new Item("Gunky Key", "A metal key caked in gunk. It won't fit into a keyhole yet.", true);
-                player.takeItem(gunkyKey);
-                System.out.println("You take the Gunky Key.");
-            } else {
-                System.out.println("You've already taken the key.");
-            }
+        // check items in room first
+        Item roomItem = currentRoom.getItem(noun);
+        if (roomItem != null) {
+            System.out.println(roomItem.getDescription());
             return;
         }
-
-        // Kitchen - Examine sink
-        if (noun.equalsIgnoreCase("sink")) {
-            System.out.println("The old sink still runs. Maybe it could clean something.");
-            return;
-        }
-
-        // Kitchen - Examine soap
-        if (noun.equalsIgnoreCase("soap")) {
-            System.out.println("The soap looks good enough to clean grime and gunk.");
-            return;
-        }
-
-        // Kitchen - Examine rag
-        if (noun.equalsIgnoreCase("rag")) {
-            System.out.println("The rag looks old, but still absorbent.");
-            return;
-        }
-
-        // Exit room - Examine heavy door
-        if (noun.equalsIgnoreCase("heavy door")) {
-            System.out.println("The Heavy Door has a narrow keyhole. A properly cleaned key might fit.");
-            return;
-        }
-
-        // If it's in the current room, show that description
-        Item here = r.getItem(noun);
-        if (here != null) {
-            System.out.println(here.getDescription());
-            return;
-        }
-
-        // Or if it's in your inventory, show that description
+        // check inventory
         for (Item it : player.getInventory()) {
             if (it.getName().equalsIgnoreCase(noun)) {
                 System.out.println(it.getDescription());
                 return;
             }
         }
-
-        System.out.println("You don't notice anything special.");
+        // check special objects by name
+        if (noun.equalsIgnoreCase("sink")) {
+            System.out.println("The old sink still runs. Maybe it could clean something.");
+            return;
+        }
+        System.out.println("You don't see that here.");
     }
 
-
-    // use method for player to use their items
-    private void use(String noun) {
-        Room r = player.getCurrentRoom();
-
-        // Use sink to clean the Gunky Key if the player has the rag or soap
-        if (noun.equalsIgnoreCase("sink")) {
-            boolean hasGunkyKey = player.hasItem("Gunky Key");
-            boolean hasSoap = player.hasItem("Soap");
-            boolean hasRag = player.hasItem("Rag");
-
-            if (!hasGunkyKey) {
-                System.out.println("You splash some water around. Nothing important happens.");
-                return;
-            }
-
-            if (hasSoap || hasRag) {
-                if (player.removeItemByName("Gunky Key")) {
-                    System.out.println("You scrub the gunk away. You now have a Clean Key.");
-                    player.takeItem(new Item("Clean Key", "A shiny key that should fit the lock.", true));
+    private void useItem(String noun) {
+        if (!player.hasItem(noun)) {
+            System.out.println("You don't have that item.");
+            return;
+        }
+        // sample: using brass key in kitchen opens a cupboard and reveals a coin
+        if (noun.equalsIgnoreCase("Brass Key") || noun.equalsIgnoreCase("portrait_key")) {
+            if (currentRoom instanceof RoomKitchen) {
+                if (!player.hasItem("Ancient Coin")) {
+                    Item coin = new Item("Ancient Coin", "An engraved coin with strange symbols.");
+                    player.takeItem(coin);
+                    System.out.println("You used the key and found an Ancient Coin inside a cupboard!");
+                    GameDatabase.log(player.getName(), "Used key and found Ancient Coin");
                 } else {
-                    System.out.println("You fumble the key. Try again.");
+                    System.out.println("You already found the coin here.");
                 }
             } else {
-                System.out.println("You rinse the key, but the gunk stays. Maybe use soap or a rag with it.");
+                System.out.println("You use the key but nothing happens here.");
             }
             return;
         }
-
-        // Use key or use door
-        if (noun.equalsIgnoreCase("key") || noun.equalsIgnoreCase("clean key") || noun.equalsIgnoreCase("door")) {
-
-            // Ensure that the key can only be used in the last room
-            if (!(r instanceof RoomThree)) {
-                System.out.println("There's nothing here that this key fits.");
-                return;
-            }
-
-            // If the player does not have the clean key, the alarm will activate and they will not be able to unlock door
-            if (!player.hasItem("Clean Key")) {
-                System.out.println("The key is still too dirty, or you don't have the cleaned key.");
-                // To trigger alarm if they try to force it
-                AlarmSystem.getInstance().ActivateAlarm("Someone is messing with the door without the right key.");
-                return;
-            }
-
-            // Ensure that the alarm is deactivated before the door can be opened.
-            if (AlarmSystem.getInstance().isAlarmActive()){
-                System.out.println("You cannot open the door with the alarm on. Deactivate alarm with keypad and try again");
-                return;
-            }
-            System.out.println("You insert the Clean Key into the Heavy Door. It turns with a heavy click.");
-            System.out.println("The door opens. You step outside. You escaped the mansion!");
-            running = false;
-            return;
-        }
-
-        if (noun.equalsIgnoreCase("alarm") || noun.equalsIgnoreCase("alarm keypad")) {
-            AlarmSystem status = AlarmSystem.getInstance();
-            if (status.isAlarmActive()) {
-                status.DeactivateAlarm();
-                (System.out).println("Alarm has been deactivated.");
-            } else {
-                status.ActivateAlarm(" you used the keypad");
-                System.out.println("Alarm has been activated.");
-            }
-            return;
-        }
-
-        System.out.println("Nothing happens.");
+        System.out.println("You try to use it, but nothing important happens.");
     }
 
-    public SaveData toSaveData() {
-        SaveData sd = new SaveData();
-        sd.playerName = player.getName();
-        sd.health = player.getHealth();
-        sd.level = 1;
-        sd.currentRoom = player.getCurrentRoom().getName();
-        return sd;
-    }
-
-
-    public static Game fromSave(SaveData save) {
-        Game g = new Game();
-        Room startRoom = g.rooms.getOrDefault(save.currentRoom, g.rooms.get("Kitchen"));
-        g.player = new Player(save.playerName, startRoom);
-        g.player.takeDamage(100 - save.health);
-        return g;
+    /**
+     * HELP option 3: full help + dynamic listing of exits and items
+     */
+    private void showHelp() {
+        System.out.println();
+        System.out.println("=== HELP ===");
+        System.out.println("Commands:");
+        System.out.println(" go [direction|room]   — Move to an available exit");
+        System.out.println(" look                  — Examine the current room");
+        System.out.println(" examine [object]      — Examine an object or item");
+        System.out.println(" take [item]           — Pick up an item in the room");
+        System.out.println(" use [item]            — Use an item from your inventory");
+        System.out.println(" talk [npc]            — Talk to someone in the room");
+        System.out.println(" inventory             — List items you're carrying");
+        System.out.println(" save                  — Save your game to the database");
+        System.out.println(" load                  — Load your saved game from the database");
+        System.out.println(" help                  — Show this help menu");
+        System.out.println(" exit                  — Quit the game");
+        System.out.println();
+        // dynamic information:
+        System.out.println("Exits from here:");
+        List<String> exits = currentRoom.getExitNames();
+        if (exits.isEmpty()) {
+            System.out.println(" (none)");
+        } else {
+            for (String e : exits) System.out.println(" - " + e);
+        }
+        System.out.println();
+        System.out.println("Items in this room:");
+        if (currentRoom.getItems().isEmpty()) {
+            System.out.println(" (none)");
+        } else {
+            for (Item it : currentRoom.getItems()) System.out.println(" - " + it.getName());
+        }
+        System.out.println();
+        System.out.println("Your inventory:");
+        if (player.getInventory().isEmpty()) {
+            System.out.println(" (empty)");
+        } else {
+            for (Item it : player.getInventory()) System.out.println(" - " + it.getName());
+        }
+        System.out.println("=== END HELP ===");
+        System.out.println();
     }
 }
+

@@ -1,44 +1,55 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-// ** Abstract **  Base room type. Other rooms extend this.
+/**
+ * Abstract room base class. Subclasses should provide key, name, description and entry behavior.
+ */
 public abstract class Room {
-    private String name;
-    private String description;
-    private Map<String, Room> exits = new HashMap<>();
-    private List<Item> items = new ArrayList<>();
+    private final String key; // unique identifier used in saves (e.g., "RoomKitchen")
+    private final String name;
+    private final String description;
+    private final Map<String, Room> exits = new LinkedHashMap<>();
+    private final List<Item> items = new ArrayList<>();
+    private final List<NPC> npcs = new ArrayList<>();
 
-    public Room(String name, String description) {
+    protected Room(String key, String name, String description) {
+        this.key = key;
         this.name = name;
         this.description = description;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getKey() { return key; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getName() { return name; }
 
-    // Player can use a simple string like "Move north"
+    public String getDescription() { return description; }
+
     public void addExit(String direction, Room room) {
+        if (direction == null || room == null) return;
         exits.put(direction.toLowerCase(), room);
     }
 
-    public Room getExit(String direction) {
-        if (direction == null) return null;
-        return exits.get(direction.toLowerCase());
+    public Room getExit(String directionOrName) {
+        if (directionOrName == null) return null;
+        // try direct direction match first
+        Room r = exits.get(directionOrName.toLowerCase());
+        if (r != null) return r;
+        // try to match by room name (case-insensitive)
+        for (Room rr : exits.values()) {
+            if (rr.getName().equalsIgnoreCase(directionOrName)) return rr;
+        }
+        return null;
     }
 
     public List<String> getExitNames() {
-        return new ArrayList<>(exits.keySet());
+        List<String> list = new ArrayList<>();
+        for (Map.Entry<String, Room> e : exits.entrySet()) {
+            list.add(e.getKey() + " -> " + e.getValue().getName());
+        }
+        return list;
     }
 
     public void addItem(Item item) {
-        items.add(item);
+        if (item != null) items.add(item);
     }
 
     public void removeItem(Item item) {
@@ -46,19 +57,38 @@ public abstract class Room {
     }
 
     public List<Item> getItems() {
-        return items;
+        return Collections.unmodifiableList(items);
     }
 
-    // Find an item in this room by name
     public Item getItem(String name) {
-        for (Item item : items) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return item;
-            }
-        }
+        if (name == null) return null;
+        for (Item it : items) if (it.getName().equalsIgnoreCase(name)) return it;
         return null;
     }
 
-    // ** Base to Polymorphism **  Each room can customize what happens when you enter
+    public void addNpc(NPC npc) {
+        if (npc != null) npcs.add(npc);
+    }
+
+    public NPC getNpcByName(String name) {
+        if (name == null) return null;
+        for (NPC n : npcs) if (n.getName().equalsIgnoreCase(name)) return n;
+        return null;
+    }
+
+    public List<NPC> getNpcs() {
+        return Collections.unmodifiableList(npcs);
+    }
+
+    /**
+     * Called when a player enters the room.
+     */
     public abstract void enter(Player player);
+
+    /**
+     * Optional hint for help system to show room-specific help.
+     */
+    public String getHint() {
+        return null;
+    }
 }

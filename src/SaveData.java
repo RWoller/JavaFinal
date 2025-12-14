@@ -1,7 +1,14 @@
-// Simple data holder for saving/loading game state
+/**
+ * Simple data holder used for DB load/save operations.
+ */
 public class SaveData {
-    public String playerName;
-    public int health;
-    public int level;
-    public String currentRoom; // store room name instead of description
+    public final String playerName;
+    public final String currentRoom;
+    public final String inventory;
+
+    public SaveData(String playerName, String currentRoom, String inventory) {
+        this.playerName = playerName;
+        this.currentRoom = currentRoom;
+        this.inventory = inventory;
+    }
 }
