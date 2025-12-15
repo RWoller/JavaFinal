@@ -1,6 +1,8 @@
 <component name="libraryTable">
   <library name="log4j-core-2.17.2-javadoc">
-    <CLASSES />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/sqlite-jdbc-3.51.0.0.jar!/" />
+    </CLASSES>
     <JAVADOC>
       <root url="jar://$PROJECT_DIR$/resources/log4j-core-2.17.2-javadoc.jar!/" />
     </JAVADOC>

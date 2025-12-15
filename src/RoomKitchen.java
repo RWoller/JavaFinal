@@ -1,16 +1,18 @@
-public class RoomKitchen extends Room{
-
+public class RoomKitchen extends Room {
     public RoomKitchen() {
-        super("Kitchen", "You see a deep sink and dusty cupboards. There's a greasy old cookbook on the counter.");
-        addItem(new Item("Cookbook", "Greased up cookbook with a bunch of notes written on it.", true));
-        addItem(new Item("Soap", "Cuts through grease and grime.", true));
-        addItem(new Item("Sink", "Old but still has running water.", false));
-        addItem(new Item("Rag", "Old but still absorbent.", true));
+        super("RoomKitchen", "Kitchen", "A neglected kitchen. There is a locked cupboard and a smell of old soup.");
+        addItem(new Item("Gunky Key", "An old brass key, slightly tarnished."));
+        addItem(new Item("Soap", "Cuts through grease and grime."));
+        addItem(new Item("Rag", "Old but still absorbent."));
     }
 
-    // ** Polymorphism ** What happens when the player enters the room
     @Override
     public void enter(Player player) {
-        System.out.println(getDescription());
+        System.out.println("You enter the Kitchen. " + getDescription());
+    }
+
+    @Override
+    public String getHint() {
+        return "Maybe a key will open the locked cupboard.";
     }
 }

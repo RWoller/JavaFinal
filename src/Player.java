@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Player extends NPC to reuse inventory/health, and tracks current room and a room key.
+ */
 public class Player extends NPC {
     private Room currentRoom;
 
@@ -31,8 +34,6 @@ public class Player extends NPC {
         if (item != null) {
             inventory.add(item);
             System.out.println("You picked up the " + item.getName() + ".");
-        } else {
-            System.out.println("There’s no item here.");
         }
     }
 
@@ -49,22 +50,14 @@ public class Player extends NPC {
 
     // To check if player has an item by name
     public boolean hasItem(String name) {
-        for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(name)) {
-                return true;
-            }
+        if (name == null) return false;
+        for (Item it : inventory) {
+            if (it.getName().equalsIgnoreCase(name)) return true;
         }
         return false;
     }
 
-    // To remove item from inventory by name
-    public boolean removeItemByName(String name) {
-        for (int i = 0; i < inventory.size(); i++) {
-            if (inventory.get(i).getName().equalsIgnoreCase(name)) {
-                inventory.remove(i);
-                return true;
-            }
-        }
-        return false;
+    public List<Item> getInventory() {
+        return new ArrayList<>(inventory);
     }
 }

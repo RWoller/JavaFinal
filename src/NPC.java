@@ -1,17 +1,25 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Non-player character with dialog and inventory.
+ */
 public class NPC {
     protected String name;
-    protected List<RoomObject> inventory;
+    protected final List<Item> inventory = new ArrayList<>();
     protected int health;
+
+    public NPC(String name) {
+        this.name = name == null ? "NPC" : name;
+        this.health = 100;
+    }
 
     public void takeDamage(int damage) {
         health -= damage;
     }
 
-    public void healHealth(int health) {
-        this.health += health;
+    public void healHealth(int amount) {
+        this.health += amount;
     }
 
     public boolean isAlive() {
@@ -19,21 +27,19 @@ public class NPC {
     }
 
     public String getName() { return name; }
-    public List<RoomObject> getInventory() { return inventory; }
+    public List<Item> getInventory() { return inventory; }
     public int getHealth() { return health; }
 
-    public NPC(String name) {
-        this.name = name;
-        this.inventory = new ArrayList<>();
-        this.health = 100;
-    }
-
     public void addItem(Item item) {
-        inventory.add(item);
+        if (item != null) inventory.add(item);
     }
 
     public void removeItem(Item item) {
         inventory.remove(item);
+    }
+
+    public String speak() {
+        return "They have nothing to say.";
     }
 
     public RoomObject getInventoryItem(String itemName) {
