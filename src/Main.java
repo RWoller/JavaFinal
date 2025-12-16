@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         GameDatabase.init();
 
-        System.out.println("== Welcome to Fractured Memo ==");
+        System.out.println(Strings.get("welcome"));
         while (true) {
             printMainMenu();
             String choice = scanner.nextLine().trim();
@@ -17,27 +17,27 @@ public class Main {
                 case "1" -> startNewGame();
                 case "2" -> loadGame();
                 case "3" -> {
-                    System.out.println("Exiting game. Goodbye!");
+                    System.out.println(Strings.get("end"));
                     GameDatabase.log("System", "Exited game from main menu");
                     return;
                 }
-                default -> System.out.println("Invalid option. Please choose 1, 2, or 3.");
+                default -> System.out.println(Strings.get("menu_error"));
             }
         }
     }
 
     private static void printMainMenu() {
-        System.out.println("\nMain Menu:");
-        System.out.println("1. New Game");
-        System.out.println("2. Load Game (by player name)");
-        System.out.println("3. Exit");
-        System.out.print("Choose an option: ");
+        System.out.println(Strings.get("menu"));
+        System.out.println("1. " + Strings.get("new_game"));
+        System.out.println("2. " + Strings.get("load_game"));
+        System.out.println("3. " + Strings.get("exit_game"));
+        System.out.print(Strings.get("choose_option"));
     }
 
     private static void startNewGame() {
-        System.out.print("Enter your character's name: ");
+        System.out.print(Strings.get("enter_name"));
         String name = scanner.nextLine().trim();
-        if (name.isEmpty()) name = "Hero";
+        if (name.isEmpty()) name = Strings.get("default_name");
         Game game = new Game();
         // name the player
         game.setPlayer(new Player(name, game.getRoom("RoomKitchen")));
@@ -47,20 +47,20 @@ public class Main {
     }
 
     private static void loadGame() {
-        System.out.print("Enter player name to load: ");
+        System.out.print(Strings.get("load_message"));
         String name = scanner.nextLine().trim();
         if (name.isEmpty()) {
-            System.out.println("No player name entered.");
+            System.out.println(Strings.get("load_no_name"));
             return;
         }
         SaveData sd = GameDatabase.loadGame(name);
         if (sd == null) {
-            System.out.println("No saved game found for '" + name + "'.");
+            System.out.println(Strings.get("load_no_save", name));
             GameDatabase.log("System", "Attempted to load non-existent save: " + name);
             return;
         }
         Game game = new Game(sd);
-        GameDatabase.log(name, "Loaded game");
+        GameDatabase.log(name, Strings.get("load_success"));
         game.run();
     }
 }

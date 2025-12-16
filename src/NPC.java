@@ -39,6 +39,6 @@ public class NPC {
     }
 
     public String speak() {
-        return "They have nothing to say.";
+        return Strings.get("npc_default_speak");
     }
 }

@@ -26,22 +26,22 @@ public class Player extends NPC {
         if (room != null) {
             this.currentRoom = room;
             this.currentRoomKey = room.getKey();
-            System.out.println("You move to " + room.getName() + ".");
+            System.out.println(Strings.get("player_moveTo", room.getName()));
         }
     }
 
     public void takeItem(Item item) {
         if (item != null) {
             inventory.add(item);
-            System.out.println("You picked up the " + item.getName() + ".");
+            System.out.println(Strings.get("player_takeItem", item.getName()));
         }
     }
 
     public void showInventory() {
         if (inventory.isEmpty()) {
-            System.out.println("You have nothing.");
+            System.out.println(Strings.get("player_inventory_empty"));
         } else {
-            System.out.println("You are carrying:");
+            System.out.println(Strings.get("player_inventory", inventory.size()));
             for (Item item : inventory) System.out.println(" - " + item.getName());
         }
     }
