@@ -1,18 +1,18 @@
 public class RoomKitchen extends Room {
     public RoomKitchen() {
-        super("RoomKitchen", "Kitchen", "A neglected kitchen. There is a locked cupboard and a smell of old soup.");
-        addItem(new Item("Gunky Key", "An old brass key, slightly tarnished."));
-        addItem(new Item("Soap", "Cuts through grease and grime."));
-        addItem(new Item("Rag", "Old but still absorbent."));
+        super("RoomKitchen", Strings.get("kitchen_name"), Strings.get("kitchen_desc"));
+        addItem(new Item(Strings.get("gunky_key_name"), Strings.get("gunky_key_desc")));
+        addItem(new Item(Strings.get("soap_name"), Strings.get("soap_desc")));
+        addItem(new Item(Strings.get("rag_name"), Strings.get("rag_desc")));
     }
 
     @Override
     public void enter(Player player) {
-        System.out.println("You enter the Kitchen. " + getDescription());
+        System.out.println(Strings.get("kitchen_enter") + " " + getDescription());
     }
 
     @Override
     public String getHint() {
-        return "Maybe a key will open the locked cupboard.";
+        return Strings.get("kitchen_hint");
     }
 }

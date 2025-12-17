@@ -1,22 +1,22 @@
 public class RoomLivingQuarters extends Room {
     public RoomLivingQuarters() {
-        super("RoomLivingQuarters", "Living Quarters", "You stand in an oddly inviting living space with relics that would be worth a fortune and belongs in a museum.");
-        addItem(new Item("Antique Cipher", "A curious cipher that was displayed as decor."));
-        addNpc(new NPC("Generous Maiden") {
+        super("RoomLivingQuarters", Strings.get("quarters_name"), Strings.get("quarters_desc"));
+        addItem(new Item(Strings.get("cipher_name"), Strings.get("cipher_desc")));
+        addNpc(new NPC(Strings.get("maiden_name")) {
             @Override
             public String speak() {
-                return "Welcome... please make yourself welcome, but be please carefully take what you need.";
+                return Strings.get("maiden_speak");
             }
         });
     }
 
     @Override
     public void enter(Player player) {
-        System.out.println("You step into the . " + getDescription());
+        System.out.println(Strings.get("quarters_enter") + " " + getDescription());
     }
 
     @Override
     public String getHint() {
-        return "Try examining the portrait or talking to the maiden.";
+        return Strings.get("quarters_hint");
     }
 }

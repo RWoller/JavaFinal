@@ -1,22 +1,22 @@
 public class RoomGreenhouse extends Room {
     public RoomGreenhouse() {
-        super("RoomGreenhouse", "Greenhouse", "A very eerie place with cold damp cobblestone floors and overgrown plantlife.");
-        addItem(new Item("Planting Almanac", "A heavy journal with strange logs for disturbing sightings and plant creatures"));
-        addNpc(new NPC("Groundskeeper") {
+        super("RoomGreenhouse", Strings.get("greenhouse_name"), Strings.get("greenhouse_description"));
+        addItem(new Item(Strings.get("planting_almanac_name"), Strings.get("planting_almanac_desc")));
+        addNpc(new NPC(Strings.get("groundskeeper_name")) {
             @Override
             public String speak() {
-                return "Some plants... hide secrets... to truth that might want to be dampened.";
+                return Strings.get("groundskeeper_speak");
             }
         });
     }
 
     @Override
     public void enter(Player player) {
-        System.out.println("You enter the Greenhouse. " + getDescription());
+        System.out.println(Strings.get("greenhouse_enter") + " " + getDescription());
     }
 
     @Override
     public String getHint() {
-        return "Look for things that might not be invited here.";
+        return Strings.get("greenhouse_hint");
     }
 }
