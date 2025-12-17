@@ -38,7 +38,7 @@ public class Main {
         System.out.print(Strings.get("enter_name"));
         String name = scanner.nextLine().trim();
         if (name.isEmpty()) name = Strings.get("default_name");
-        Game game = new Game();
+        Game game = Game.getGame();
         // name the player
         game.setPlayer(new Player(name, game.getRoom("RoomKitchen")));
         game.setCurrentRoom(game.getPlayer().getCurrentRoom());
@@ -59,7 +59,7 @@ public class Main {
             GameDatabase.log("System", "Attempted to load non-existent save: " + name);
             return;
         }
-        Game game = new Game(sd);
+        Game game = Game.getGame(sd);
         GameDatabase.log(name, Strings.get("load_success"));
         game.run();
     }

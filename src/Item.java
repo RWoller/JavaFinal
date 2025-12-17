@@ -17,4 +17,9 @@ public class Item {
     public String getDescription() {
         return description;
     }
+
+    @Override
+    public String toString() {
+        return "Item: Name: " + name + ", Description: " + description;
+    }
 }

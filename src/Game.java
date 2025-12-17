@@ -1,9 +1,15 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
 
 /**
  * Core game loop and state manager.
  * Uses GameDatabase for saves and logs.
+ * Uses Singleton Class Pattern
  */
 public class Game {
     private Player player;
@@ -11,13 +17,28 @@ public class Game {
     private Room currentRoom;
     private boolean running = true;
     private final Scanner scanner = new Scanner(System.in);
+    private static Game game;
 
-    public Game() {
+    //
+    private Game() {
         GameDatabase.init(); // ensure DB and tables exist
         setupWorld();
         // default start in kitchen
         player = new Player("Hero", rooms.get("RoomKitchen"));
         currentRoom = player.getCurrentRoom();
+    }
+
+    // 2.3 Example of Singleton Pattern
+    public static Game getGame() {
+        if (game == null) {
+            game = new Game();
+        }
+        return game;
+    }
+
+    public static Game getGame(SaveData sd){
+        game = new Game(sd);
+        return game;
     }
 
     public Player getPlayer() {
@@ -36,7 +57,7 @@ public class Game {
         this.currentRoom = room;
     }
 
-    public Game(SaveData data) {
+    private Game(SaveData data) {
         GameDatabase.init();
         setupWorld();
         Room start = rooms.getOrDefault(data.currentRoom, rooms.get("RoomKitchen"));
@@ -73,6 +94,7 @@ public class Game {
 
     public void run() {
         System.out.println(Strings.get("intro"));
+        logToFile("Game started");
         if (currentRoom != null) currentRoom.enter(player);
 
         while (running) {
@@ -80,7 +102,9 @@ public class Game {
             String input;
             try {
                 input = scanner.nextLine();
+                logToFile("Command entered: " + input);
             } catch (NoSuchElementException | IllegalStateException e) {
+                logToFile("Error: " + e.getMessage());
                 // input closed — exit gracefully
                 running = false;
                 break;
@@ -299,6 +323,17 @@ public class Game {
             for (Item it : player.getInventory()) System.out.println(" - " + it.getName());
         }
         System.out.println(Strings.get("end_help"));
+    }
+
+    //5.1 - Use of Date and times
+    //8.2 - File Writer Example that logs user commands and errors
+    private void logToFile(String msg){
+        try(FileWriter writer = new FileWriter("game_log.txt", true)){
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+            writer.write("[" + timestamp + "]" + msg + System.lineSeparator());
+        }catch(IOException e){
+            System.err.println("Logging failed");
+        }
     }
 }
 

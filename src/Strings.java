@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
+// 5.3 Use of a resource bundle
 public class Strings {
     private static final ResourceBundle bundle =
             ResourceBundle.getBundle("strings", Locale.getDefault(), new UTF8Control());
