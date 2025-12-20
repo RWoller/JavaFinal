@@ -288,6 +288,7 @@ public class Game {
                 System.out.println(Strings.get("brass_key_use_failure"));
             }
             return;
+            // Check for rapier being used inside of royal chamber which is victory condition
         } else if (noun.equalsIgnoreCase(Strings.get("rapier_name"))) {
             if (player.hasItem(Strings.get("rapier_name"))){
                 if(currentRoom instanceof RoomRoyalChamber) {
