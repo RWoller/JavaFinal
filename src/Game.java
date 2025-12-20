@@ -298,7 +298,7 @@ public class Game {
     private void showHelp() {
         // Print command descriptions
         Stream.of(CommandType.values())
-                .forEach(type -> System.out.println(Strings.get(type.getDescription())));
+                .forEach(type -> System.out.println(type.getDescription()));
 
         // dynamic information:
         System.out.println(Strings.get("exits_success"));
