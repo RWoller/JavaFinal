@@ -288,6 +288,16 @@ public class Game {
                 System.out.println(Strings.get("brass_key_use_failure"));
             }
             return;
+        } else if (noun.equalsIgnoreCase(Strings.get("rapier_name"))) {
+            if (player.hasItem(Strings.get("rapier_name"))){
+                if(currentRoom instanceof RoomRoyalChamber) {
+                    System.out.println(Strings.get("rapier_use_success"));
+                    GameDatabase.log(player.getName(), "Completed Game");
+                    running = false;
+                } else {
+                    System.out.println(Strings.get("rapier_use_failure"));
+                }
+            }
         }
         System.out.println(Strings.get("use_failure"));
     }
